@@ -1,6 +1,4 @@
-"""documentation_builder.py
-
-Build the documentation based on sphinx and the read_the_doc layout.
+"""Build the documentation based on sphinx and doxygen.
 
 License BSD-3-Clause
 Copyright (c) 2021, New York University and Max Planck Gesellschaft.
@@ -94,52 +92,23 @@ def _find_sphinx_build() -> str:
     )
 
 
-def _resource_path(project_source_dir: Path) -> Path:
+def _resource_path() -> Path:
     """
-    Fetch the resources path. This will contains all the configuration files
+    Fetch the resources path. It contains all the configuration files
     for the different executables: Doxyfile, conf.py, etc.
 
-    Args:
-        project_source_dir (str): Path to the source file of the project.
-
     Raises:
-        Exception: if the resources folder is not found.
+        AssertionError: if the resources folder is not found.
 
     Returns:
         pathlib.Path: Path to the configuration files.
     """
-    # TODO project_source_dir is unused
-
     this_dir = Path(__file__).parent
     resource_path = this_dir / "resources"
 
     assert resource_path.is_dir()
 
     return resource_path
-
-    # assert project_source_dir.is_dir()
-
-    # # Find the resources from the package.
-    # project_name = project_source_dir.name
-    # # TODO: can this special case be avoided?
-    # if project_name == "mpi_cmake_modules":
-    #     resource_path = project_source_dir / "resources"
-    #     if not resource_path.is_dir():
-    #         raise Exception(
-    #             "failed to find the resource directory in "
-    #             + str(mpi_cmake_modules.__path__)
-    #         )
-    #     return resource_path
-
-    # # Find the resources from the installation of this package.
-    # for module_path in mpi_cmake_modules.__path__:
-    #     resource_path = Path(module_path) / "resources"
-    #     if resource_path.is_dir():
-    #         return resource_path
-
-    # raise Exception(
-    #     "failed to find the resource directory in " + str(mpi_cmake_modules.__path__)
-    # )
 
 
 def _build_doxygen_xml(doc_build_dir: Path, project_source_dir: Path):
@@ -158,7 +127,7 @@ def _build_doxygen_xml(doc_build_dir: Path, project_source_dir: Path):
     doxygen = _find_doxygen()
 
     # Get the resources path.
-    resource_path = _resource_path(project_source_dir)
+    resource_path = _resource_path()
 
     # get the Doxyfile.in file
     doxyfile_in = resource_path / "sphinx" / "doxygen" / "Doxyfile.in"
@@ -491,7 +460,7 @@ def build_documentation(
     doc_build_dir.mkdir(parents=True, exist_ok=True)
 
     # Get the path to resource files.
-    resource_dir = Path(_resource_path(project_source_dir))
+    resource_dir = Path(_resource_path())
 
     #
     # Parametrize the final doc layout depending we have CMake/Python/C++ api.
