@@ -1,6 +1,7 @@
 import argparse
 import pathlib
 
+from . import __version__
 from .build import build_documentation
 
 
@@ -9,6 +10,12 @@ def main():
         return pathlib.Path(path).absolute()
 
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--version",
+        action="version",
+        help="Show version of mpiis_doc_build.",
+        version=f"mpiis_doc_build version {__version__}",
+    )
     parser.add_argument(
         "--output-dir",
         required=True,
