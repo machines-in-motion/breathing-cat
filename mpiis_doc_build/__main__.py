@@ -1,7 +1,9 @@
 import argparse
+import logging
 import pathlib
+import sys
 
-from . import __version__
+from . import __version__, find_version
 from .build import build_documentation
 
 
@@ -35,16 +37,21 @@ def main():
             auto-detected inside the package directory
         """,
     )
-    parser.add_argument(
-        "--project-version", required=True, type=str, help="Package version"
-    )
+    parser.add_argument("--project-version", type=str, help="Package version")
     parser.add_argument(
         "--force",
         "-f",
         action="store_true",
         help="Do not ask before deleting files.",
     )
+    parser.add_argument("--verbose", action="store_true", help="Enable debug output.")
     args = parser.parse_args()
+
+    if args.verbose:
+        logger_level = logging.DEBUG
+    else:
+        logger_level = logging.INFO
+    logging.basicConfig(level=logger_level)
 
     if not args.force and args.output_dir.exists():
         print(
@@ -55,7 +62,17 @@ def main():
 
         if c not in ["y", "Y", "yes"]:
             print("Abort.")
-            return
+            return 1
+
+    if not args.project_version:
+        try:
+            args.project_version = find_version.find_version(args.package_dir)
+        except find_version.VersionNotFound:
+            print(
+                "ERROR: Package version could not be determined."
+                "  Please specify it using --package-version."
+            )
+            return 1
 
     build_documentation(
         args.output_dir,
@@ -64,6 +81,8 @@ def main():
         python_pkg_path=args.python_dir,
     )
 
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
