@@ -19,7 +19,6 @@ license = {file = "LICENSE"}
 
 dependencies = [
     "breathe",
-    "doxypypy",
     "m2r",
     "mistune<2.0.0",
     "recommonmark",
