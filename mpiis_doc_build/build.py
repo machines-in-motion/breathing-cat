@@ -130,7 +130,7 @@ def _build_doxygen_xml(doc_build_dir: Path, project_source_dir: Path):
     resource_path = _resource_path()
 
     # get the Doxyfile.in file
-    doxyfile_in = resource_path / "sphinx" / "doxygen" / "Doxyfile.in"
+    doxyfile_in = resource_path / "doxygen" / "Doxyfile.in"
     assert doxyfile_in.is_file()
 
     # Which files are going to be parsed.
@@ -289,11 +289,11 @@ def _search_for_cpp_api(
         )
         # Copy the index of the C++ API.
         shutil.copy(
-            resource_dir / "sphinx" / "sphinx" / "doxygen_index_one_page.rst.in",
+            resource_dir / "sphinx" / "doxygen_index_one_page.rst.in",
             doc_build_dir / "doxygen_index_one_page.rst",
         )
         shutil.copy(
-            resource_dir / "sphinx" / "sphinx" / "doxygen_index.rst.in",
+            resource_dir / "sphinx" / "doxygen_index.rst.in",
             doc_build_dir / "doxygen_index.rst",
         )
 
@@ -385,7 +385,7 @@ def _search_for_cmake_api(
             doc_cmake_module += cmake_file.stem + "\n"
             doc_cmake_module += len(cmake_file.stem) * "-" + "\n\n"
             doc_cmake_module += ".. cmake-module:: cmake/" + cmake_file.name + "\n\n"
-        with open(resource_dir / "sphinx" / "sphinx" / "cmake_doc.rst.in", "rt") as f:
+        with open(resource_dir / "sphinx" / "cmake_doc.rst.in", "rt") as f:
             out_text = f.read().replace("@DOC_CMAKE_MODULE@", doc_cmake_module)
         with open(str(doc_build_dir / "cmake_doc.rst"), "wt") as f:
             f.write(out_text)
@@ -426,7 +426,7 @@ def _search_for_general_documentation(
         """
         )
         shutil.copy(
-            resource_dir / "sphinx" / "sphinx" / "general_documentation.rst.in",
+            resource_dir / "sphinx" / "general_documentation.rst.in",
             doc_build_dir / "general_documentation.rst",
         )
         shutil.copytree(
@@ -487,7 +487,7 @@ def build_documentation(
     # configure the index.rst.in.
     header = "Welcome to " + project_name + "'s documentation!"
     header += "\n" + len(header) * "=" + "\n"
-    with open(resource_dir / "sphinx" / "sphinx" / "index.rst.in", "rt") as f:
+    with open(resource_dir / "sphinx" / "index.rst.in", "rt") as f:
         out_text = (
             f.read()
             .replace("@HEADER@", header)
@@ -500,7 +500,7 @@ def build_documentation(
         f.write(out_text)
 
     # configure the config.py.in.
-    with open(resource_dir / "sphinx" / "sphinx" / "conf.py.in", "rt") as f:
+    with open(resource_dir / "sphinx" / "conf.py.in", "rt") as f:
         out_text = (
             f.read()
             .replace("@PROJECT_SOURCE_DIR@", os.fspath(project_source_dir))

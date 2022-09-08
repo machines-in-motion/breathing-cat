@@ -30,4 +30,4 @@ dependencies = [
 
 
 [tool.setuptools.package-data]
-mpiis_doc_build = ["resources/*.sh", "resources/**/*.in"]
+mpiis_doc_build = ["resources/**/*.in"]
