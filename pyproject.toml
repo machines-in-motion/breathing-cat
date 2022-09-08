@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "mpiis_doc_build"
+version = "0.1.0"
+description = "Tool to build documentation for C++/Python-Packages used at MPI-IS"
+authors = [
+    {name = "Maximilien Naveau"},
+    {name = "Felix Widmaier"},
+]
+maintainers = [
+    {name = "Felix Widmaier", email = "felix.widmaier@tuebingen.mpg.de"}
+]
+readme = "README.md"
+license = {file = "LICENSE"}
+
+dependencies = [
+    "breathe",
+    "doxypypy",
+    "m2r",
+    "mistune<2.0.0",
+    "recommonmark",
+    "sphinx",
+    "sphinx-rtd-theme",
+    "sphinxcontrib-moderncmakedomain",
+]
+
+
+[tool.setuptools.package-data]
+mpiis_doc_build = ["resources/*.sh", "resources/**/*.in"]
