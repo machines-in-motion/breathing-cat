@@ -511,6 +511,14 @@ def build_documentation(
     with open(doc_build_dir / "conf.py", "wt") as f:
         f.write(out_text)
 
+    # copy the custom.css to _static
+    static_dir = doc_build_dir / "_static"
+    static_dir.mkdir(exist_ok=True)
+    shutil.copy(
+        resource_dir / "sphinx" / "custom.css.in",
+        static_dir / "custom.css",
+    )
+
     #
     # Copy the license and readme file.
     #
