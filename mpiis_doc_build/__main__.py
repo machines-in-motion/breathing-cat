@@ -37,7 +37,14 @@ def main():
             auto-detected inside the package directory
         """,
     )
-    parser.add_argument("--project-version", type=str, help="Package version")
+    parser.add_argument(
+        "--package-version",
+        type=str,
+        help="""Package version that is shown in the documentation (something like
+            '1.42.0').  If not set, mpiis-doc-build tries to auto-detect it by looking
+            for files like package.xml in the package directory.
+        """,
+    )
     parser.add_argument(
         "--force",
         "-f",
@@ -64,9 +71,9 @@ def main():
             print("Abort.")
             return 1
 
-    if not args.project_version:
+    if not args.package_version:
         try:
-            args.project_version = find_version.find_version(args.package_dir)
+            args.package_version = find_version.find_version(args.package_dir)
         except find_version.VersionNotFound:
             print(
                 "ERROR: Package version could not be determined."
@@ -77,7 +84,7 @@ def main():
     build_documentation(
         args.output_dir,
         args.package_dir,
-        args.project_version,
+        args.package_version,
         python_pkg_path=args.python_dir,
     )
 
