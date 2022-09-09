@@ -28,5 +28,8 @@ dependencies = [
 ]
 
 
+[project.scripts]
+mpiis-doc-build = "mpiis_doc_build.__main__:main"
+
 [tool.setuptools.package-data]
 mpiis_doc_build = ["resources/**/*.in"]
