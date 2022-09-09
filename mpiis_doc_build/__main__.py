@@ -20,12 +20,14 @@ def main():
     )
     parser.add_argument(
         "--output-dir",
+        "-o",
         required=True,
         type=AbsolutePath,
         help="Build directory",
     )
     parser.add_argument(
         "--package-dir",
+        "-p",
         required=True,
         type=AbsolutePath,
         help="Package directory",
