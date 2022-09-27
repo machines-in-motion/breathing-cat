@@ -29,7 +29,7 @@ dependencies = [
 
 
 [project.scripts]
-mpiis-doc-build = "breathing_cat.__main__:main"
+bcat = "breathing_cat.__main__:main"
 
 [tool.setuptools.package-data]
 breathing_cat = ["resources/**/*.in"]

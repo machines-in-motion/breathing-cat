@@ -34,23 +34,24 @@ Usage
 In the most simple case you can run it like this:
 
 ```
-mpiis-doc-build --package-dir path/to/package --output-dir path/to/output
+bcat --package-dir path/to/package --output-dir path/to/output
 ```
 
-If no package version is specified, `mpiis-doc-build` tries to find it by checking a
+If no package version is specified, `bcat` tries to find it by checking a
 number of files in the package directory.  If no version is found this way, it fails
 with an error.  In this case, you can explicitly specify the version using
 `--package-version`.
 
-`mpiis-doc-build` tries to automatically detect if the package contains Python code and,
+`bcat` tries to automatically detect if the package contains Python code and,
 if yes, adds a Python API section to the documentation.  However, if your package
 contains Python modules that are only generated at build-time (e.g. Python bindings for
 C++ code) you can use `--python-dir` to specify the directory where the Python modules
 are installed to.  This way, the generated modules will be included in the documentation
 as well.
 
-For a complete list of options see `mpiis-doc-build --help`.
+For a complete list of options see `bcat --help`.
 
+Instead of the `bcat` executable, you can also use `python -m breathing_cat`.
 
 
 

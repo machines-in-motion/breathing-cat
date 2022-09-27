@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Try to auto-detect package version if not explicitly specified.
-- Install executable `mpiis-doc-build`.
+- Install executable `bcat`.
 - Short arguments `-p`/`-o` for `--package-dir`/`--output-dir`.
 
 ### Changed

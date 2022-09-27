@@ -15,8 +15,8 @@ def main():
     parser.add_argument(
         "--version",
         action="version",
-        help="Show version of breathing_cat.",
-        version=f"breathing_cat version {__version__}",
+        help="Show version of breathing-cat.",
+        version=f"breathing-cat version {__version__}",
     )
     parser.add_argument(
         "--output-dir",
@@ -43,7 +43,7 @@ def main():
         "--package-version",
         type=str,
         help="""Package version that is shown in the documentation (something like
-            '1.42.0').  If not set, mpiis-doc-build tries to auto-detect it by looking
+            '1.42.0').  If not set, breathing-cat tries to auto-detect it by looking
             for files like package.xml in the package directory.
         """,
     )
