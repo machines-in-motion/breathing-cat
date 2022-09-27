@@ -6,7 +6,7 @@ import typing
 import xml.etree.ElementTree
 
 
-_logger = logging.getLogger("mpiis_doc_build.find_version")
+_logger = logging.getLogger("breathing_cat.find_version")
 
 
 class VersionNotFound(Exception):

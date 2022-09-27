@@ -15,8 +15,8 @@ def main():
     parser.add_argument(
         "--version",
         action="version",
-        help="Show version of mpiis_doc_build.",
-        version=f"mpiis_doc_build version {__version__}",
+        help="Show version of breathing_cat.",
+        version=f"breathing_cat version {__version__}",
     )
     parser.add_argument(
         "--output-dir",

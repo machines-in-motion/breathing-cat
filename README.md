@@ -1,7 +1,7 @@
 Documentation Builder for C++ and Python packages
 =================================================
 
-mpiis_doc_build is a tool for building documentation that is used for some of the
+breathing_cat is a tool for building documentation that is used for some of the
 software packages developed at the Max Planck Institute for Intelligent Systems (MPI-IS)
 and the New York University.
 
@@ -20,7 +20,7 @@ Installation
 Simply clone this repository and install it with
 
 ```
-cd path/to/mpiis_doc_build
+cd path/to/breathing-cat
 pip install .
 ```
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 
 [project]
-name = "mpiis_doc_build"
+name = "breathing_cat"
 version = "0.1.0"
 description = "Tool to build documentation for C++/Python-Packages used at MPI-IS"
 authors = [
@@ -29,7 +29,7 @@ dependencies = [
 
 
 [project.scripts]
-mpiis-doc-build = "mpiis_doc_build.__main__:main"
+mpiis-doc-build = "breathing_cat.__main__:main"
 
 [tool.setuptools.package-data]
-mpiis_doc_build = ["resources/**/*.in"]
+breathing_cat = ["resources/**/*.in"]
