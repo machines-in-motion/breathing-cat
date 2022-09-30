@@ -21,7 +21,7 @@ dependencies = [
     "breathe",
     "m2r",
     "mistune<2.0.0",
-    "recommonmark",
+    "myst-parser",
     "sphinx",
     "sphinx-rtd-theme",
     "sphinxcontrib-moderncmakedomain",
