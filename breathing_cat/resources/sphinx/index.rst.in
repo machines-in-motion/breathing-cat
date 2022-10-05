@@ -1,7 +1,6 @@
 @HEADER@
 
-.. include:: readme.md
-   :parser: myst_parser.sphinx_
+@README@
 
 @GENERAL_DOCUMENTATION@
 
@@ -17,7 +16,4 @@ Indices and Tables
 * :ref:`genindex`
 * :ref:`search`
 
-License and Copyrights
-----------------------
-
-.. include:: license.txt
+@LICENSE@
