@@ -111,7 +111,7 @@ def _resource_path() -> Path:
     return resource_path
 
 
-def _build_doxygen_xml(doc_build_dir: Path, project_source_dir: Path):
+def _build_doxygen_xml(doc_build_dir: Path, project_source_dir: Path) -> None:
     """
     Use doxygen to parse the C++ source files and generate a corresponding xml
     entry.
@@ -163,7 +163,7 @@ def _build_doxygen_xml(doc_build_dir: Path, project_source_dir: Path):
     print("")
 
 
-def _build_breath_api_doc(doc_build_dir: Path):
+def _build_breath_api_doc(doc_build_dir: Path) -> None:
     """
     Use breathe_apidoc to parse the xml output from Doxygen and generate
     '.rst' files.
@@ -194,7 +194,7 @@ def _build_breath_api_doc(doc_build_dir: Path):
     print("")
 
 
-def _build_sphinx_api_doc(doc_build_dir: Path, python_source_dir: Path):
+def _build_sphinx_api_doc(doc_build_dir: Path, python_source_dir: Path) -> None:
     """
     Use sphinx_apidoc to parse the python files output from Doxygen and
     generate '.rst' files.
@@ -229,7 +229,7 @@ def _build_sphinx_api_doc(doc_build_dir: Path, python_source_dir: Path):
     print("")
 
 
-def _build_sphinx_build(doc_build_dir: Path):
+def _build_sphinx_build(doc_build_dir: Path) -> None:
     """
     Use sphinx_build to parse the cmake and rst files previously generated and
     generate the final html layout.
@@ -550,9 +550,9 @@ def _search_for_license(project_source_dir: Path, doc_build_dir: Path) -> str:
 def build_documentation(
     build_dir: PathLike,
     project_source_dir: PathLike,
-    project_version,
+    project_version: str,
     python_pkg_path: typing.Optional[PathLike] = None,
-):
+) -> None:
     # make sure all paths are of type Path
     doc_build_dir = Path(build_dir)
     project_source_dir = Path(project_source_dir)
