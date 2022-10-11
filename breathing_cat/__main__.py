@@ -7,7 +7,7 @@ from . import __version__, find_version
 from .build import build_documentation
 
 
-def main():
+def main() -> int:
     def AbsolutePath(path):
         return pathlib.Path(path).absolute()
 
