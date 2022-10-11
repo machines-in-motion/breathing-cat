@@ -6,11 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Support for plain text READMEs ("README" or "README.TXT").
 - Try to auto-detect package version if not explicitly specified.
 - Install executable `bcat`.
 - Short arguments `-p`/`-o` for `--package-dir`/`--output-dir`.
 
 ### Changed
+- If multiple READMEs are found, do not prefer a specific type but simply use the first
+  one found.
 - Renamed `--project-version` to `--package-version`.
 - Use MyST parser instead of recommonmark and m2r for including Markdown files.
 
