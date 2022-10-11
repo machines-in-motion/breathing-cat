@@ -8,12 +8,14 @@ import fnmatch
 import os
 import shutil
 import subprocess
+import sys
 import textwrap
 import typing
 from pathlib import Path
 
 
 PathLike = typing.Union[str, os.PathLike]
+FileFormat = typing.Literal["md", "rst", "txt"]
 
 
 def _get_cpp_file_patterns() -> typing.List[str]:
@@ -436,7 +438,7 @@ def _search_for_general_documentation(
     return general_documentation
 
 
-def _copy_readme(source_dir: Path, destination_dir: Path) -> str:
+def _copy_readme(source_dir: Path, destination_dir: Path) -> FileFormat:
     """Searches for a README in the source and copies it to the destination directory .
 
     Searches for a "README.md" or "README.rst" (case-insensitive) in the source
@@ -448,23 +450,30 @@ def _copy_readme(source_dir: Path, destination_dir: Path) -> str:
         destination_dir: Directory to which the README is copied.
 
     Returns:
-        Format of the README file (either "md" or "rst").
+        Format of the README file.
 
     Raises
         FileNotFoundError: If no README is found in the source directory.
     """
-    readmes = [
-        p.resolve()
-        for p in source_dir.glob("*")
-        if p.name.lower() in ["readme.md", "readme.rst"]
-    ]
+    # map allowed readme file names to file format
+    options: typing.Dict[str, FileFormat] = {
+        "readme.md": "md",
+        "readme.rst": "rst",
+        "readme": "txt",
+        "readme.txt": "txt",
+    }
+
+    readmes = [p.resolve() for p in source_dir.glob("*") if p.name.lower() in options]
     if not readmes:
         raise FileNotFoundError(f"No README file found in {source_dir}")
 
-    # sort alphabetically so that "readme.md" is preferred in case both are found
-    readme = sorted(readmes)[0]
-    readme_format = readme.suffix[1:]
-    target_filename = readme.name.lower()
+    # if multiple READMEs are found, print warning and use the first one that was found
+    if len(readmes) > 1:
+        print(f"WARNING: Found multiple README files in {source_dir}.", file=sys.stderr)
+
+    readme = readmes[0]
+    readme_format = options[readme.name.lower()]
+    target_filename = f"readme.{readme_format}"
     shutil.copy(readme, destination_dir / target_filename)
 
     return readme_format
@@ -510,6 +519,13 @@ def _search_for_readme(project_source_dir: Path, doc_build_dir: Path) -> str:
                 """
                 .. include:: readme.md
                    :parser: myst_parser.sphinx_
+            """
+            )
+        elif readme_format == "txt":
+            readme_include = textwrap.dedent(
+                """
+                .. include:: readme.txt
+                   :literal:
             """
             )
         else:
