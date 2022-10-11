@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Renamed `--project-version` to `--package-version`.
+- Use MyST parser instead of recommonmark and m2r for including Markdown files.
 
 ### Fixed
 - Workaround for an incompatibility issue between the RTD theme and autodoc, which
