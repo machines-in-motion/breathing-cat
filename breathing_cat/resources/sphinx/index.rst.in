@@ -1,6 +1,6 @@
 @HEADER@
 
-.. mdinclude:: readme.md
+@README@
 
 @GENERAL_DOCUMENTATION@
 
@@ -16,7 +16,4 @@ Indices and Tables
 * :ref:`genindex`
 * :ref:`search`
 
-License and Copyrights
-----------------------
-
-.. mdinclude:: license.txt
+@LICENSE@

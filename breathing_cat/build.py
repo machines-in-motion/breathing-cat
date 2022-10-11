@@ -436,6 +436,117 @@ def _search_for_general_documentation(
     return general_documentation
 
 
+def _copy_readme(source_dir: Path, destination_dir: Path) -> str:
+    """Searches for a README in the source and copies it to the destination directory .
+
+    Searches for a "README.md" or "README.rst" (case-insensitive) in the source
+    directory and copies it to the destination directory.  Returns the format of the
+    file.
+
+    Args:
+        source_dir: Where to look for the README file.
+        destination_dir: Directory to which the README is copied.
+
+    Returns:
+        Format of the README file (either "md" or "rst").
+
+    Raises
+        FileNotFoundError: If no README is found in the source directory.
+    """
+    readmes = [
+        p.resolve()
+        for p in source_dir.glob("*")
+        if p.name.lower() in ["readme.md", "readme.rst"]
+    ]
+    if not readmes:
+        raise FileNotFoundError(f"No README file found in {source_dir}")
+
+    # sort alphabetically so that "readme.md" is preferred in case both are found
+    readme = sorted(readmes)[0]
+    readme_format = readme.suffix[1:]
+    target_filename = readme.name.lower()
+    shutil.copy(readme, destination_dir / target_filename)
+
+    return readme_format
+
+
+def _copy_license(source_dir: Path, destination_dir: Path) -> None:
+    """Searches for a license in the source and copies it to the destination directory.
+
+    Args:
+        source_dir: Where to look for the README file.
+        destination_dir: Directory to which the README is copied.
+
+    Raises
+        FileNotFoundError: If no README is found in the source directory.
+    """
+    license_file = [
+        p.resolve()
+        for p in source_dir.glob("*")
+        if p.name in ["LICENSE", "license.txt"]
+    ]
+    if not license_file:
+        raise FileNotFoundError(f"No license file found in {source_dir}")
+
+    shutil.copy(license_file[0], destination_dir / "license.txt")
+
+
+def _search_for_readme(project_source_dir: Path, doc_build_dir: Path) -> str:
+    """Copy README file to build directory and return RST code to include it.
+
+    Args:
+        project_source_dir: Where to look for the file.
+        doc_build_dir: Directory to which the is copied.
+
+    Returns:
+        RST snippet for including the README.  In case no README is found an empty
+        string is return.
+    """
+    try:
+        readme_format = _copy_readme(project_source_dir, doc_build_dir)
+        # the include command differs depending on the format of the README
+        if readme_format == "md":
+            readme_include = textwrap.dedent(
+                """
+                .. include:: readme.md
+                   :parser: myst_parser.sphinx_
+            """
+            )
+        else:
+            readme_include = ".. include:: readme.rst"
+    except FileNotFoundError:
+        readme_include = ""
+
+    return readme_include
+
+
+def _search_for_license(project_source_dir: Path, doc_build_dir: Path) -> str:
+    """Copy license file to build directory and return RST code to include it.
+
+    Args:
+        project_source_dir: Where to look for the file.
+        doc_build_dir: Directory to which the is copied.
+
+    Returns:
+        RST snippet for including the license.  In case no license is found an empty
+        string is return.
+    """
+    try:
+        _copy_license(project_source_dir, doc_build_dir)
+        license_include = textwrap.dedent(
+            """
+            License and Copyrights
+            ----------------------
+
+            .. include:: license.txt
+        """
+        )
+    except FileNotFoundError:
+        license_include = ""
+
+    return license_include
+
+
 def build_documentation(
     build_dir: PathLike,
     project_source_dir: PathLike,
@@ -481,6 +592,12 @@ def build_documentation(
     )
 
     #
+    # Copy the license and readme file.
+    #
+    readme_include = _search_for_readme(project_source_dir, doc_build_dir)
+    license_include = _search_for_license(project_source_dir, doc_build_dir)
+
+    #
     # Configure the config.py and the index.rst.
     #
 
@@ -491,10 +608,12 @@ def build_documentation(
         out_text = (
             f.read()
             .replace("@HEADER@", header)
+            .replace("@README@", readme_include)
             .replace("@GENERAL_DOCUMENTATION@", general_documentation)
             .replace("@CPP_API@", cpp_api)
             .replace("@PYTHON_API@", python_api)
             .replace("@CMAKE_API@", cmake_api)
+            .replace("@LICENSE@", license_include)
         )
     with open(doc_build_dir / "index.rst", "wt") as f:
         f.write(out_text)
@@ -518,28 +637,6 @@ def build_documentation(
         resource_dir / "sphinx" / "custom.css.in",
         static_dir / "custom.css",
     )
-
-    #
-    # Copy the license and readme file.
-    #
-    readme = [
-        p.resolve()
-        for p in project_source_dir.glob("*")
-        if p.name.lower() in ["readme.md", "readme.rst"]
-    ]
-    # sort alphabetically so that "readme.md" is preferred in case both are
-    # found
-    readme = sorted(readme)
-    if readme:
-        shutil.copy(readme[0], doc_build_dir / "readme.md")
-
-    license_file = [
-        p.resolve()
-        for p in project_source_dir.glob("*")
-        if p.name in ["LICENSE", "license.txt"]
-    ]
-    if license_file:
-        shutil.copy(license_file[0], doc_build_dir / "license.txt")
 
     #
     # Generate the html doc

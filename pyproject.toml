@@ -19,8 +19,6 @@ license = {file = "LICENSE"}
 
 dependencies = [
     "breathe",
-    "m2r",
-    "mistune<2.0.0",
     "myst-parser",
     "sphinx",
     "sphinx-rtd-theme",
