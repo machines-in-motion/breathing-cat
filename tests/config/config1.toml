@@ -1,0 +1,2 @@
+[doxygen]
+exclude_patterns = ["config1"]

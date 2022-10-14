@@ -13,6 +13,8 @@ import textwrap
 import typing
 from pathlib import Path
 
+from . import config as _config
+
 
 PathLike = typing.Union[str, os.PathLike]
 FileFormat = typing.Literal["md", "rst", "txt"]
@@ -568,12 +570,19 @@ def build_documentation(
     project_source_dir: PathLike,
     project_version: str,
     python_pkg_path: typing.Optional[PathLike] = None,
+    config_file: typing.Optional[PathLike] = None,
 ) -> None:
     # make sure all paths are of type Path
     doc_build_dir = Path(build_dir)
     project_source_dir = Path(project_source_dir)
     if python_pkg_path is not None:
         python_pkg_path = Path(python_pkg_path)
+
+    # use default config in none is given
+    if config_file is not None:
+        config = _config.load_config(config_file)
+    else:
+        config = _config.find_and_load_config(project_source_dir)
 
     #
     # Initialize the paths

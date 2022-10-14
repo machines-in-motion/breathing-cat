@@ -23,6 +23,7 @@ def main() -> int:
         "-o",
         required=True,
         type=AbsolutePath,
+        metavar="DIRECTORY",
         help="Build directory",
     )
     parser.add_argument(
@@ -30,11 +31,13 @@ def main() -> int:
         "-p",
         required=True,
         type=AbsolutePath,
+        metavar="DIRECTORY",
         help="Package directory",
     )
     parser.add_argument(
         "--python-dir",
         type=AbsolutePath,
+        metavar="DIRECTORY",
         help="""Directory containing the Python package.  If not set, it is
             auto-detected inside the package directory
         """,
@@ -52,6 +55,14 @@ def main() -> int:
         "-f",
         action="store_true",
         help="Do not ask before deleting files.",
+    )
+    parser.add_argument(
+        "--config",
+        type=AbsolutePath,
+        metavar="FILE",
+        help="""Path to config file.  If not set explicitly, bcat searches for a file
+            'breathing_cat.toml' in the package directory.
+        """,
     )
     parser.add_argument("--verbose", action="store_true", help="Enable debug output.")
     args = parser.parse_args()
@@ -88,6 +99,7 @@ def main() -> int:
         args.package_dir,
         args.package_version,
         python_pkg_path=args.python_dir,
+        config_file=args.config,
     )
 
     return 0
