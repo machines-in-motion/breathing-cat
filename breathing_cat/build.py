@@ -115,14 +115,17 @@ def _resource_path() -> Path:
     return resource_path
 
 
-def _build_doxygen_xml(doc_build_dir: Path, project_source_dir: Path) -> None:
+def _build_doxygen_xml(
+    doc_build_dir: Path, project_source_dir: Path, doxygen_config: dict
+) -> None:
     """
     Use doxygen to parse the C++ source files and generate a corresponding xml
     entry.
 
     Args:
-        doc_build_dir (str): Path to where the doc should be built
-        project_source_dir (str): Path to the source file of the project.
+        doc_build_dir: Path to where the doc should be built
+        project_source_dir: Path to the source file of the project.
+        doxygen_config: User-defined configuration for the Doxygen.
     """
     # Get project_name
     project_name = project_source_dir.name
@@ -140,6 +143,15 @@ def _build_doxygen_xml(doc_build_dir: Path, project_source_dir: Path) -> None:
     # Which files are going to be parsed.
     doxygen_file_patterns = " ".join(_get_cpp_file_patterns())
 
+    # If multiple exclude patterns are provided, join them to a multi-line string
+    # where each line has a \ at the end (this is how doxygen expects multiple
+    # values).
+    doxygen_exclude_patterns = " \\ \n".join(doxygen_config["exclude_patterns"])
+    # replace ${PACKAGE_DIR} in the patterns
+    doxygen_exclude_patterns = doxygen_exclude_patterns.replace(
+        "${PACKAGE_DIR}", str(project_source_dir)
+    )
+
     # Where to put the doxygen output.
     doxygen_output = doc_build_dir / "doxygen"
 
@@ -150,6 +162,7 @@ def _build_doxygen_xml(doc_build_dir: Path, project_source_dir: Path) -> None:
             .replace("@PROJECT_NAME@", project_name)
             .replace("@PROJECT_SOURCE_DIR@", os.fspath(project_source_dir))
             .replace("@DOXYGEN_FILE_PATTERNS@", doxygen_file_patterns)
+            .replace("@DOXYGEN_EXCLUDE_PATTERNS@", doxygen_exclude_patterns)
             .replace("@DOXYGEN_OUTPUT@", str(doxygen_output))
         )
     doxyfile_out = doxygen_output / "Doxyfile"
@@ -254,14 +267,15 @@ def _build_sphinx_build(doc_build_dir: Path) -> None:
 
 
 def _search_for_cpp_api(
-    doc_build_dir: Path, project_source_dir: Path, resource_dir: Path
+    doc_build_dir: Path, project_source_dir: Path, resource_dir: Path, config: dict
 ) -> str:
     """Search if there is a C++ api do document, and document it.
 
     Args:
-        doc_build_dir (str): Path where to create the temporary output.
-        project_source_dir (str): Path to the source file of the project.
-        resource_dir (str): Path to the resources files for the build.
+        doc_build_dir: Path where to create the temporary output.
+        project_source_dir: Path to the source file of the project.
+        resource_dir: Path to the resources files for the build.
+        config: User configuration.
 
     Returns:
         str: String added to the main index.rst in case there is a C++ api.
@@ -302,7 +316,7 @@ def _search_for_cpp_api(
         )
 
         # Build the doxygen xml files.
-        _build_doxygen_xml(doc_build_dir, project_source_dir)
+        _build_doxygen_xml(doc_build_dir, project_source_dir, config["doxygen"])
         # Generate the .rst corresponding to the doxygen xml
         _build_breath_api_doc(doc_build_dir)
 
@@ -604,7 +618,9 @@ def build_documentation(
 
     # String to replace in the main index.rst
 
-    cpp_api = _search_for_cpp_api(doc_build_dir, project_source_dir, resource_dir)
+    cpp_api = _search_for_cpp_api(
+        doc_build_dir, project_source_dir, resource_dir, config
+    )
 
     python_api = _search_for_python_api(
         doc_build_dir, project_source_dir, python_pkg_path
@@ -623,7 +639,7 @@ def build_documentation(
     license_include = _search_for_license(project_source_dir, doc_build_dir)
 
     #
-    # Configure the config.py and the index.rst.
+    # Configure the conf.py and the index.rst.
     #
 
     # configure the index.rst.in.
