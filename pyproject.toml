@@ -23,6 +23,7 @@ dependencies = [
     "sphinx",
     "sphinx-rtd-theme",
     "sphinxcontrib-moderncmakedomain",
+    "tomli",
 ]
 
 

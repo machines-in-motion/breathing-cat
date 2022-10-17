@@ -54,6 +54,27 @@ For a complete list of options see `bcat --help`.
 Instead of the `bcat` executable, you can also use `python -m breathing_cat`.
 
 
+Configuration
+-------------
+
+A package can contain an optional config file `breathing_cat.toml` which has to be
+placed either in the root directory of the package or in `doc[s]/`.
+
+Below is an exemplary config file, including all available options with their default
+values:
+
+```toml
+[doxygen]
+# List of patterns added to DOXYGEN_EXCLUDE_PATTERNS (see doxygen documentation).
+# The string '${PACKAGE_DIR}' in the patterns is replaced with the path to the package.
+# It is recommended to put this at the beginning of patterns to avoid unintended matches
+# on higher up parts on the path, which would result in *all* the files of the package
+# being excluded.
+# Example:
+# exclude_patterns = ["${PACKAGE_DIR}/include/some_third_party_lib/*"]
+exclude_patterns = []
+```
+
 
 Assumptions Regarding Package Structure
 ---------------------------------------

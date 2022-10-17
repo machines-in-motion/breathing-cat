@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Try to auto-detect package version if not explicitly specified.
 - Install executable `bcat`.
 - Short arguments `-p`/`-o` for `--package-dir`/`--output-dir`.
+- Provide additional configuration via `breathing_cat.toml`
+- Add `DOXYGEN_EXCLUDE_PATTERNS` via config file.
 
 ### Changed
 - If multiple READMEs are found, do not prefer a specific type but simply use the first
