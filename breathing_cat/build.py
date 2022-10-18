@@ -3,7 +3,7 @@
 License BSD-3-Clause
 Copyright (c) 2021, New York University and Max Planck Gesellschaft.
 """
-
+import collections.abc
 import fnmatch
 import os
 import shutil
@@ -579,6 +579,61 @@ def _search_for_license(project_source_dir: Path, doc_build_dir: Path) -> str:
     return license_include
 
 
+def _construct_intersphinx_mapping_config(
+    mapping_config: typing.Mapping[
+        str,
+        typing.Union[
+            str,
+            typing.Mapping[typing.Literal["target", "inventory"], typing.Optional[str]],
+        ],
+    ]
+) -> str:
+    """Construct argument for intersphinx_mapping parameter.
+
+    The config can be given in a complete form, providing both target URL and inventory
+    file name or a short version with only the target URL:
+
+    .. code-block:: python
+
+        {
+            # short variant for convenience (if inventory=None)
+            "pkg1": "https://docs.pkg1.com",
+            # long variant for full support
+            "pkg2": {
+                "target": "https://pkg2.org/docs",
+                "inventory": "my_inv.txt"
+            },
+        }
+
+    Args:
+        mapping_config: Dictionary with the mapping configuration.
+
+    Returns:
+        Python code that defines a dictionary that can be assigned to
+        ``intersphinx_mapping``.
+    """
+    pattern = "'{name}': ({target!r}, {inventory!r})"
+    mappings = []
+
+    for name, params in mapping_config.items():
+        if isinstance(params, str):
+            params = {"target": params, "inventory": None}
+
+        # make sure types are correct (so that using repr is save)
+        assert isinstance(name, str)
+        assert isinstance(params, collections.abc.Mapping)
+        assert isinstance(params["target"], str)
+        assert params["inventory"] is None or isinstance(params["inventory"], str)
+
+        mappings.append(
+            pattern.format(
+                name=name, target=params["target"], inventory=params["inventory"]
+            )
+        )
+
+    return "{" + ", ".join(mappings) + "}"
+
+
 def build_documentation(
     build_dir: PathLike,
     project_source_dir: PathLike,
@@ -642,6 +697,11 @@ def build_documentation(
     # Configure the conf.py and the index.rst.
     #
 
+    # intersphinx config
+    intersphinx_mapping = _construct_intersphinx_mapping_config(
+        config["intersphinx"]["mapping"]
+    )
+
     # configure the index.rst.in.
     header = "Welcome to " + project_name + "'s documentation!"
     header += "\n" + len(header) * "=" + "\n"
@@ -667,6 +727,7 @@ def build_documentation(
             .replace("@PROJECT_NAME@", project_name)
             .replace("@PROJECT_VERSION@", project_version)
             .replace("@DOXYGEN_XML_OUTPUT@", str(doc_build_dir / "doxygen" / "xml"))
+            .replace("@INTERSPHINX_MAPPING@", intersphinx_mapping)
         )
     with open(doc_build_dir / "conf.py", "wt") as f:
         f.write(out_text)

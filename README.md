@@ -73,6 +73,18 @@ values:
 # Example:
 # exclude_patterns = ["${PACKAGE_DIR}/include/some_third_party_lib/*"]
 exclude_patterns = []
+
+
+[intersphinx.mapping]
+# Add intersphinx mappings.  See intersphinx documentation for the meaning of the
+# values.
+# Two notations are supported:
+#
+# 1. Long notation (results in `'foo': ('docs.foo.org', 'my_inv.txt'):
+# foo = {target = "docs.foo.org", inventory = "my_inv.txt"}
+#
+# 2. # Short notation (results in `'foo': ('docs.foo.org', None):
+# foo = "docs.foo.org"
 ```
 
 
