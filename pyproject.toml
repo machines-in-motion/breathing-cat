@@ -26,6 +26,8 @@ dependencies = [
     "tomli",
 ]
 
+[project.optional-dependencies]
+test = ["pytest"]
 
 [project.scripts]
 bcat = "breathing_cat.__main__:main"
