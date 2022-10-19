@@ -16,6 +16,7 @@ _DEFAULT_CONFIG: typing.Dict[str, typing.Any] = {
     "doxygen": {
         "exclude_patterns": [],
     },
+    "intersphinx": {"mapping": {}},
 }
 
 

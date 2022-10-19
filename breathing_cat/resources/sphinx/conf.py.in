@@ -136,11 +136,7 @@ html_css_files = [
 
 # -- Options for intersphinx extension ---------------------------------------
 
-# TODO intersphinx doesn't make sense like this.  Either packages need some way to add
-# their own configuration or we should remove it.
-
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {"https://docs.python.org/": None}
+intersphinx_mapping = @INTERSPHINX_MAPPING@
 
 # -- Options for todo extension ----------------------------------------------
 
