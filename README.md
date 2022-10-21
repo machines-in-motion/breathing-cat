@@ -1,7 +1,7 @@
 Documentation Builder for C++ and Python packages
 =================================================
 
-breathing_cat is a tool for building documentation that is used for some of the
+Breathing Cat is a tool for building documentation that is used for some of the
 software packages developed at the Max Planck Institute for Intelligent Systems (MPI-IS)
 and the New York University.
 
@@ -17,15 +17,17 @@ assumptions we make regarding the package structure).
 Installation
 ------------
 
-Simply clone this repository and install it with
-
+Breathing Cat depends on [Doxygen](https://doxygen.nl) for generating C++ documentation.
+As Doxygen cannot automatically be installed as dependency by pip, it needs to be
+installed manually.  For example on Ubuntu:
 ```
-cd path/to/breathing-cat
-pip install .
+sudo apt install doxygen
 ```
 
-Note that for building C++ API documentation Doxygen is used, which needs to be
-installed separately (e.g. with `sudo apt install doxygen` on Ubuntu).
+To install Breathing Cat with all further dependencies:
+```
+pip install breathing_cat
+```
 
 
 Usage
