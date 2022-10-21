@@ -13,8 +13,5 @@ public:
      *
      * @return The bared foo value.
      */
-    int bar(int foo)
-    {
-        return foo;
-    }
+    int bar(int foo);
 };
