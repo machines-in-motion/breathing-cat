@@ -1,6 +1,5 @@
 import pathlib
 import shutil
-from copy import deepcopy
 
 import pytest
 
@@ -10,72 +9,6 @@ from breathing_cat import config
 @pytest.fixture
 def test_data():
     return pathlib.Path(__file__).parent / "config"
-
-
-def test_update_recursive():
-    """Test various cases of ``update_recursive``."""
-    d1 = {
-        "foo": 42,
-        "bar": {"one": 1, "two": 2},
-    }
-    u1 = {
-        "foo": 13,
-        "bar": {"two": 3},
-    }
-    u2 = {
-        "bar": {"three": 3},
-        "baz": 23,
-    }
-
-    # Note: first argument is updated in place, so pass copies here
-    assert config.update_recursive(deepcopy(d1), {}) == d1
-    assert config.update_recursive({}, d1) == d1
-    assert config.update_recursive(deepcopy(d1), u1) == {
-        "foo": 13,
-        "bar": {"one": 1, "two": 3},
-    }
-    assert config.update_recursive(deepcopy(d1), u2) == {
-        "foo": 42,
-        "bar": {"one": 1, "two": 2, "three": 3},
-        "baz": 23,
-    }
-
-
-def test_find_config_file_at_root(tmp_path: pathlib.Path):
-    """Test find_config_file with config file at root of search directory."""
-    cfg_file = tmp_path / config._CONFIG_FILE_NAME
-    cfg_file.touch()
-
-    found_file = config.find_config_file(tmp_path)
-    assert found_file == cfg_file
-
-
-def test_find_config_file_in_doc(tmp_path: pathlib.Path):
-    """Test find_config_file with config file in <package>/doc."""
-    path = tmp_path / "doc"
-    cfg_file = path / config._CONFIG_FILE_NAME
-    path.mkdir()
-    cfg_file.touch()
-
-    found_file = config.find_config_file(tmp_path)
-    assert found_file == cfg_file
-
-
-def test_find_config_file_in_docs(tmp_path: pathlib.Path):
-    """Test find_config_file with config file in <package>/docs."""
-    path = tmp_path / "docs"
-    cfg_file = path / config._CONFIG_FILE_NAME
-    path.mkdir()
-    cfg_file.touch()
-
-    found_file = config.find_config_file(tmp_path)
-    assert found_file == cfg_file
-
-
-def test_find_config_file_none(tmp_path: pathlib.Path):
-    """Test find_config_file with no file to be found."""
-    with pytest.raises(FileNotFoundError):
-        config.find_config_file(tmp_path)
 
 
 def test_load_config_not_found():
@@ -90,11 +23,47 @@ def test_load_config(test_data):
     assert cfg["doxygen"]["exclude_patterns"][0] == "config1"
 
 
-def test_find_and_load_config(tmp_path, test_data):
-    """Test finding and loading a config file."""
-    # copy test config to tmp_path
-    cfg_file = test_data / "config1.toml"
-    shutil.copyfile(cfg_file, tmp_path / config._CONFIG_FILE_NAME)
+def _setup_pkg_dir_with_config(config_location, tmp_path, test_data):
+    """Helper for the test_find_and_load_config_* functions."""
+    # create target directory
+    target_dir = tmp_path / config_location
+    target_dir.mkdir(exist_ok=True)
+    # copy config file from test data to target location
+    shutil.copyfile(
+        test_data / "config1.toml",
+        target_dir / config._CONFIG_FILE_NAME,
+    )
 
-    cfg = config.find_and_load_config(tmp_path)
+    return tmp_path
+
+
+def test_find_and_load_config_from_root(tmp_path, test_data):
+    """Test finding and loading a config file."""
+    pkg_path = _setup_pkg_dir_with_config(".", tmp_path, test_data)
+
+    cfg = config.find_and_load_config(pkg_path)
     assert cfg["doxygen"]["exclude_patterns"][0] == "config1"
+
+
+def test_find_and_load_config_from_doc(tmp_path, test_data):
+    """Test finding and loading a config file."""
+    pkg_path = _setup_pkg_dir_with_config("doc", tmp_path, test_data)
+
+    cfg = config.find_and_load_config(pkg_path)
+    assert cfg["doxygen"]["exclude_patterns"][0] == "config1"
+
+
+def test_find_and_load_config_from_docs(tmp_path, test_data):
+    """Test finding and loading a config file."""
+    pkg_path = _setup_pkg_dir_with_config("docs", tmp_path, test_data)
+
+    cfg = config.find_and_load_config(pkg_path)
+    assert cfg["doxygen"]["exclude_patterns"][0] == "config1"
+
+
+def test_find_and_load_config_invalid_location(tmp_path, test_data):
+    """Test finding and loading a config file."""
+    pkg_path = _setup_pkg_dir_with_config("this_is_wrong", tmp_path, test_data)
+
+    cfg = config.find_and_load_config(pkg_path)
+    assert cfg == config._DEFAULT_CONFIG

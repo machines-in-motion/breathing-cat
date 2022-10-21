@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from breathing_cat.config import config_from_dict
 from breathing_cat import build
 
 
@@ -18,10 +19,58 @@ def test_resource_path() -> None:
     assert (path / "sphinx" / "conf.py.in").is_file()
 
 
+def test_prepare_doxygen_exclude_patterns() -> None:
+    pkg_path = Path("/tmp/foo")
+
+    # old style variable (deprecated but currently still supported)
+    config = config_from_dict({"doxygen": {"exclude_patterns": ["third_party*"]}})
+    assert (
+        build._prepare_doxygen_exclude_patterns(pkg_path, config["doxygen"])
+        == "third_party*"
+    )
+
+    # using PACKAGE_DIR variable
+    config = config_from_dict(
+        {"doxygen": {"exclude_patterns": ["{{PACKAGE_DIR}}/third_party*"]}}
+    )
+    assert (
+        build._prepare_doxygen_exclude_patterns(pkg_path, config["doxygen"])
+        == "/tmp/foo/third_party*"
+    )
+
+    # using old variable style (deprecated but still supported)
+    config = config_from_dict(
+        {"doxygen": {"exclude_patterns": ["${PACKAGE_DIR}/third_party*"]}}
+    )
+    assert (
+        build._prepare_doxygen_exclude_patterns(pkg_path, config["doxygen"])
+        == "/tmp/foo/third_party*"
+    )
+
+    # multiple
+    config = config_from_dict(
+        {
+            "doxygen": {
+                "exclude_patterns": [
+                    "something",
+                    "{{PACKAGE_DIR}}/foobar",
+                    "{{PACKAGE_DIR}}/third_party*",
+                ]
+            }
+        }
+    )
+    assert (
+        build._prepare_doxygen_exclude_patterns(pkg_path, config["doxygen"])
+        == r"""something \
+/tmp/foo/foobar \
+/tmp/foo/third_party*"""
+    )
+
+
 def test_build_doxygen_xml(ros_pkg_path: Path, tmp_path: Path) -> None:
     build_dir = tmp_path
 
-    config = {"exclude_patterns": ["${PACKAGE_DIR}/include/ros_pkg/third_party*"]}
+    config = {"exclude_patterns": ["{{PACKAGE_DIR}}/include/ros_pkg/third_party*"]}
     build._build_doxygen_xml(build_dir, ros_pkg_path, config)
 
     # verify creation of some files

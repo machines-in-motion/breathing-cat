@@ -33,7 +33,7 @@ dependencies = [
     "sphinx",
     "sphinx-rtd-theme",
     "sphinxcontrib-moderncmakedomain",
-    "tomli",
+    "variconf[toml]",
 ]
 
 [project.urls]
