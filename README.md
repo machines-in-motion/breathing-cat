@@ -91,7 +91,31 @@ exclude_patterns = []
 Assumptions Regarding Package Structure
 ---------------------------------------
 
-TODO
+Breathing Cat makes the following assumptions regarding the structure of the documented
+package:
+
+- The directory containing the package has the same name as the actual package.
+- The package may contain a README file that has one of the following names (case
+  insensitive):  `README`, `README.txt`, `README.md`, `README.rst`
+- The package may contain a license file called `LICENSE` or `license.txt`.
+- C++ code is documented using Doxygen comments in the header files.
+- C++ header files are located outside of `src/` (typically in `include/`).
+- Python code is documented using docstrings (supported formats are standard Sphinx,
+  NumPy Style and Google Style).
+- The Python code is located in one of the following directories (relative to the
+  package root):
+
+  - `<package_name>/`
+  - `python/<package_name>/`
+  - `src/<package_name>/`
+
+- CMake files that should be documented are located in `cmake/` and use the directives
+  provided by the
+  [sphinxcontrib.moderncmakedomain](https://github.com/scikit-build/moderncmakedomain)
+  extension.
+- General documentation is provided in reStructuredText- or Markdown-files located in
+  `doc/` or `docs/`.  All files found in this directory are automatically included in
+  alphabetical order.
 
 
 Copyright & License
