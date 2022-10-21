@@ -5,7 +5,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "breathing_cat"
-version = "0.1.0"
 description = "Tool to build documentation for C++/Python-Packages used at MPI-IS"
 authors = [
     {name = "Maximilien Naveau"},
@@ -16,6 +15,7 @@ maintainers = [
 ]
 readme = "README.md"
 license = {file = "LICENSE"}
+dynamic = ["version"]
 
 dependencies = [
     "breathe",
@@ -34,3 +34,6 @@ bcat = "breathing_cat.__main__:main"
 
 [tool.setuptools.package-data]
 breathing_cat = ["resources/**/*.in"]
+
+[tool.setuptools.dynamic]
+version = {attr = "breathing_cat.__version__"}
