@@ -1,7 +1,7 @@
 Documentation Builder for C++ and Python packages
 =================================================
 
-breathing_cat is a tool for building documentation that is used for some of the
+Breathing Cat is a tool for building documentation that is used for some of the
 software packages developed at the Max Planck Institute for Intelligent Systems (MPI-IS)
 and the New York University.
 
@@ -17,15 +17,17 @@ assumptions we make regarding the package structure).
 Installation
 ------------
 
-Simply clone this repository and install it with
-
+Breathing Cat depends on [Doxygen](https://doxygen.nl) for generating C++ documentation.
+As Doxygen cannot automatically be installed as dependency by pip, it needs to be
+installed manually.  For example on Ubuntu:
 ```
-cd path/to/breathing-cat
-pip install .
+sudo apt install doxygen
 ```
 
-Note that for building C++ API documentation Doxygen is used, which needs to be
-installed separately (e.g. with `sudo apt install doxygen` on Ubuntu).
+To install Breathing Cat with all further dependencies:
+```
+pip install breathing_cat
+```
 
 
 Usage
@@ -91,7 +93,31 @@ exclude_patterns = []
 Assumptions Regarding Package Structure
 ---------------------------------------
 
-TODO
+Breathing Cat makes the following assumptions regarding the structure of the documented
+package:
+
+- The directory containing the package has the same name as the actual package.
+- The package may contain a README file that has one of the following names (case
+  insensitive):  `README`, `README.txt`, `README.md`, `README.rst`
+- The package may contain a license file called `LICENSE` or `license.txt`.
+- C++ code is documented using Doxygen comments in the header files.
+- C++ header files are located outside of `src/` (typically in `include/`).
+- Python code is documented using docstrings (supported formats are standard Sphinx,
+  NumPy Style and Google Style).
+- The Python code is located in one of the following directories (relative to the
+  package root):
+
+  - `<package_name>/`
+  - `python/<package_name>/`
+  - `src/<package_name>/`
+
+- CMake files that should be documented are located in `cmake/` and use the directives
+  provided by the
+  [sphinxcontrib.moderncmakedomain](https://github.com/scikit-build/moderncmakedomain)
+  extension.
+- General documentation is provided in reStructuredText- or Markdown-files located in
+  `doc/` or `docs/`.  All files found in this directory are automatically included in
+  alphabetical order.
 
 
 Copyright & License
