@@ -115,8 +115,33 @@ def _resource_path() -> Path:
     return resource_path
 
 
+def _prepare_doxygen_exclude_patterns(
+    project_source_dir: Path, doxygen_config: typing.Mapping
+) -> str:
+    """Convert the doxygen exclude patterns config into a string for Doxyfile.
+
+    Args:
+        project_source_dir: Path to the source file of the project.
+        doxygen_config: User-defined configuration for the Doxygen.
+
+    Returns:
+        String that can be set as value for EXCLUDE_PATTERNS in Doxyfile.
+    """
+    # If multiple exclude patterns are provided, join them to a multi-line string
+    # where each line has a \ at the end (this is how doxygen expects multiple
+    # values).
+    exclude_patterns = " \\\n".join(doxygen_config["exclude_patterns"])
+
+    # replace "{{PACKAGE_DIR}}" in the patterns
+    exclude_patterns = exclude_patterns.replace(
+        "{{PACKAGE_DIR}}", str(project_source_dir)
+    )
+
+    return exclude_patterns
+
+
 def _build_doxygen_xml(
-    doc_build_dir: Path, project_source_dir: Path, doxygen_config: dict
+    doc_build_dir: Path, project_source_dir: Path, doxygen_config: typing.Mapping
 ) -> None:
     """
     Use doxygen to parse the C++ source files and generate a corresponding xml
@@ -143,13 +168,8 @@ def _build_doxygen_xml(
     # Which files are going to be parsed.
     doxygen_file_patterns = " ".join(_get_cpp_file_patterns())
 
-    # If multiple exclude patterns are provided, join them to a multi-line string
-    # where each line has a \ at the end (this is how doxygen expects multiple
-    # values).
-    doxygen_exclude_patterns = " \\ \n".join(doxygen_config["exclude_patterns"])
-    # replace ${PACKAGE_DIR} in the patterns
-    doxygen_exclude_patterns = doxygen_exclude_patterns.replace(
-        "${PACKAGE_DIR}", str(project_source_dir)
+    doxygen_exclude_patterns = _prepare_doxygen_exclude_patterns(
+        project_source_dir, doxygen_config
     )
 
     # Where to put the doxygen output.
@@ -267,7 +287,10 @@ def _build_sphinx_build(doc_build_dir: Path) -> None:
 
 
 def _search_for_cpp_api(
-    doc_build_dir: Path, project_source_dir: Path, resource_dir: Path, config: dict
+    doc_build_dir: Path,
+    project_source_dir: Path,
+    resource_dir: Path,
+    config: typing.Mapping,
 ) -> str:
     """Search if there is a C++ api do document, and document it.
 

@@ -68,12 +68,12 @@ values:
 ```toml
 [doxygen]
 # List of patterns added to DOXYGEN_EXCLUDE_PATTERNS (see doxygen documentation).
-# The string '${PACKAGE_DIR}' in the patterns is replaced with the path to the package.
+# The string '{{PACKAGE_DIR}}' in the patterns is replaced with the path to the package.
 # It is recommended to put this at the beginning of patterns to avoid unintended matches
 # on higher up parts on the path, which would result in *all* the files of the package
 # being excluded.
 # Example:
-# exclude_patterns = ["${PACKAGE_DIR}/include/some_third_party_lib/*"]
+# exclude_patterns = ["{{PACKAGE_DIR}}/include/some_third_party_lib/*"]
 exclude_patterns = []
 
 
