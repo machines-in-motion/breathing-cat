@@ -23,6 +23,42 @@ def test_load_config(test_data):
     assert cfg["doxygen"]["exclude_patterns"][0] == "config1"
 
 
+def test_config_from_dict_intersphinx(test_data):
+    """Test loading a config file with load_config()."""
+    cfg = config.config_from_dict(
+        {
+            "intersphinx": {
+                "mapping": {
+                    "long": {"target": "docs.foo.org", "inventory": "my_inv.txt"},
+                    "short": "docs.foo.org",
+                }
+            },
+        }
+    )
+    assert cfg["intersphinx"]["mapping"] == {
+        "long": {"target": "docs.foo.org", "inventory": "my_inv.txt"},
+        "short": "docs.foo.org",
+    }
+
+
+def test_load_config_intersphinx(test_data):
+    """Test loading a config file with load_config()."""
+    cfg = config.load_config(test_data / "config_intersphinx.toml")
+    assert cfg["intersphinx"]["mapping"] == {
+        "long": {"target": "docs.foo.org", "inventory": "my_inv.txt"},
+        "short": "docs.foo.org",
+    }
+
+
+def test_find_and_load_config_intersphinx(test_data):
+    """Test loading a config file with load_config()."""
+    cfg = config.find_and_load_config(test_data, "config_intersphinx.toml")
+    assert cfg["intersphinx"]["mapping"] == {
+        "long": {"target": "docs.foo.org", "inventory": "my_inv.txt"},
+        "short": "docs.foo.org",
+    }
+
+
 def _setup_pkg_dir_with_config(config_location, tmp_path, test_data):
     """Helper for the test_find_and_load_config_* functions."""
     # create target directory

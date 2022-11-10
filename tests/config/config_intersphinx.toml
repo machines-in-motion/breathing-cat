@@ -1,0 +1,3 @@
+[intersphinx.mapping]
+long = {target = "docs.foo.org", inventory = "my_inv.txt"}
+short = "docs.foo.org"
