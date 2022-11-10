@@ -1,6 +1,7 @@
 import os
 import pathlib
 import typing
+from dataclasses import dataclass, field
 
 import variconf
 from omegaconf import OmegaConf
@@ -20,8 +21,29 @@ _DEFAULT_CONFIG: typing.Dict[str, typing.Any] = {
 }
 
 
+@dataclass
+class DefaultConfig:
+    @dataclass
+    class Doxygen:
+        exclude_patterns: typing.List[str] = field(default_factory=list)
+
+    @dataclass
+    class Intersphinx:
+        # FIXME: Unions are currently not supported by OmegaConf. It is on the readmap
+        # for 2.3, though, so there is hope for the future :).
+        mapping: typing.Dict[str, typing.Union[typing.Dict[str, str], str]] = field(
+            default_factory=dict
+        )
+
+    # for compatibility of deprecated ${PACKAGE_DIR}
+    PACKAGE_DIR: str = "{{PACKAGE_DIR}}"
+
+    doxygen: Doxygen = Doxygen()
+    intersphinx: Intersphinx = Intersphinx()
+
+
 def _get_config_loader() -> variconf.WConf:
-    return variconf.WConf(_DEFAULT_CONFIG, strict=False)
+    return variconf.WConf(DefaultConfig, strict=False)
 
 
 def config_from_dict(config: dict) -> dict:
