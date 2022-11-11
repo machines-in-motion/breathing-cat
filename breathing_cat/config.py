@@ -22,7 +22,7 @@ _DEFAULT_CONFIG: typing.Dict[str, typing.Any] = {
 
 def config_from_dict(config: dict) -> dict:
     """Get the default configuration."""
-    config_loader = variconf.WConf(_DEFAULT_CONFIG)
+    config_loader = variconf.WConf(_DEFAULT_CONFIG, strict=False)
     config_loader.load_dict(config)
 
     return typing.cast(dict, OmegaConf.to_container(config_loader.get(), resolve=True))
@@ -40,7 +40,7 @@ def load_config(config_file: PathLike) -> dict:
     Returns:
         Configuration.
     """
-    config_loader = variconf.WConf(_DEFAULT_CONFIG)
+    config_loader = variconf.WConf(_DEFAULT_CONFIG, strict=False)
     config_loader.load_file(config_file)
 
     return typing.cast(dict, OmegaConf.to_container(config_loader.get(), resolve=True))
@@ -63,7 +63,7 @@ def find_and_load_config(
     package_dir = pathlib.PurePath(package_dir)
     search_paths = [package_dir, package_dir / "doc", package_dir / "docs"]
 
-    config_loader = variconf.WConf(_DEFAULT_CONFIG)
+    config_loader = variconf.WConf(_DEFAULT_CONFIG, strict=False)
     config_loader.load_file(
         config_file_name, search_paths=search_paths, fail_if_not_found=False
     )
