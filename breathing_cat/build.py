@@ -8,7 +8,6 @@ import fnmatch
 import os
 import shutil
 import subprocess
-import sys
 import textwrap
 import typing
 from pathlib import Path
@@ -477,12 +476,15 @@ def _search_for_general_documentation(
     return general_documentation
 
 
-def _copy_readme(source_dir: Path, destination_dir: Path) -> FileFormat:
-    """Searches for a README in the source and copies it to the destination directory .
+def _copy_index_or_readme(source_dir: Path, destination_dir: Path) -> FileFormat:
+    """Searches for a index.rst or README file in the source and copies it to the
+    destination directory.
 
-    Searches for a "README.md" or "README.rst" (case-insensitive) in the source
-    directory and copies it to the destination directory.  Returns the format of the
-    file.
+    Searches for [index.rst, readme.rst, readme.md, readme.txt, readme]
+    (case-insensitive) in the source directory and copies the first match to the
+    destination directory.
+
+    Returns the format of the file (for example "rst").
 
     Args:
         source_dir: Where to look for the README file.
@@ -496,21 +498,24 @@ def _copy_readme(source_dir: Path, destination_dir: Path) -> FileFormat:
     """
     # map allowed readme file names to file format
     options: typing.Dict[str, FileFormat] = {
-        "readme.md": "md",
+        "index.rst": "rst",
         "readme.rst": "rst",
+        "readme.md": "md",
         "readme": "txt",
         "readme.txt": "txt",
     }
 
-    readmes = [p.resolve() for p in source_dir.glob("*") if p.name.lower() in options]
-    if not readmes:
-        raise FileNotFoundError(f"No README file found in {source_dir}")
+    root_files = [p for p in source_dir.iterdir() if p.is_file()]
 
-    # if multiple READMEs are found, print warning and use the first one that was found
-    if len(readmes) > 1:
-        print(f"WARNING: Found multiple README files in {source_dir}.", file=sys.stderr)
+    def find_matching_file():
+        for candidate in options:
+            for file in root_files:
+                if file.name.lower() == candidate:
+                    return file.resolve()
 
-    readme = readmes[0]
+        raise FileNotFoundError(f"No README or index file found in {source_dir}")
+
+    readme = find_matching_file()
     readme_format = options[readme.name.lower()]
     target_filename = f"readme.{readme_format}"
     shutil.copy(readme, destination_dir / target_filename)
@@ -539,19 +544,19 @@ def _copy_license(source_dir: Path, destination_dir: Path) -> None:
     shutil.copy(license_file[0], destination_dir / "license.txt")
 
 
-def _search_for_readme(project_source_dir: Path, doc_build_dir: Path) -> str:
-    """Copy README file to build directory and return RST code to include it.
+def _search_for_index_or_readme(project_source_dir: Path, doc_build_dir: Path) -> str:
+    """Copy index/README file to build directory and return RST code to include it.
 
     Args:
         project_source_dir: Where to look for the file.
         doc_build_dir: Directory to which the is copied.
 
     Returns:
-        RST snippet for including the README.  In case no README is found an empty
+        RST snippet for including the file.  In case none is found an empty
         string is return.
     """
     try:
-        readme_format = _copy_readme(project_source_dir, doc_build_dir)
+        readme_format = _copy_index_or_readme(project_source_dir, doc_build_dir)
         # the include command differs depending on the format of the README
         if readme_format == "md":
             readme_include = textwrap.dedent(
@@ -713,7 +718,7 @@ def build_documentation(
     #
     # Copy the license and readme file.
     #
-    readme_include = _search_for_readme(project_source_dir, doc_build_dir)
+    readme_include = _search_for_index_or_readme(project_source_dir, doc_build_dir)
     license_include = _search_for_license(project_source_dir, doc_build_dir)
 
     #

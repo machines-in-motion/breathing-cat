@@ -149,7 +149,7 @@ def _test_copy_readme(tmp_path: Path, filename_in: str, filename_out: str) -> No
     readme = pkg_dir / filename_in
     readme.write_text("Hello")
 
-    build._copy_readme(pkg_dir, build_dir)
+    build._copy_index_or_readme(pkg_dir, build_dir)
     build_dir_content = [str(f.name) for f in build_dir.iterdir()]
     assert (
         build_dir / filename_out
@@ -173,9 +173,32 @@ def test_copy_readme_rst(tmp_path: Path) -> None:
     _test_copy_readme(tmp_path, "README.rst", "readme.rst")
 
 
+def test_copy_readme_index_rst(tmp_path: Path) -> None:
+    _test_copy_readme(tmp_path, "index.rst", "readme.rst")
+
+
 def test_copy_readme_not_found(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError):
         _test_copy_readme(tmp_path, "wrong_name", "readme.rst")
+
+
+def test_copy_index_or_readme_precedence(tmp_path: Path) -> None:
+    build_dir = tmp_path / "build"
+    build_dir.mkdir()
+    pkg_dir = tmp_path / "pkg"
+    pkg_dir.mkdir()
+
+    readme = pkg_dir / "README.rst"
+    readme.write_text("This is the README")
+    index_rst = pkg_dir / "index.rst"
+    index_rst.write_text("This is the index.rst")
+
+    build._copy_index_or_readme(pkg_dir, build_dir)
+    build_dir_content = [str(f.name) for f in build_dir.iterdir()]
+    assert (
+        build_dir / "readme.rst"
+    ).is_file(), f"readme.rst not found.  build dir content: {build_dir_content}"
+    assert (build_dir / "readme.rst").read_text() == "This is the index.rst"
 
 
 def _test_copy_license(tmp_path: Path, filename_in: str, filename_out: str) -> None:

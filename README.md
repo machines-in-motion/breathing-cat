@@ -97,8 +97,17 @@ Breathing Cat makes the following assumptions regarding the structure of the doc
 package:
 
 - The directory containing the package has the same name as the actual package.
-- The package may contain a README file that has one of the following names (case
-  insensitive):  `README`, `README.txt`, `README.md`, `README.rst`
+- If the package contains one of the following files (case insensitive) in the root
+  directory, it is included into the documentations main page:
+  ```
+  index.rst, README.rst, README.md, README.txt, README
+  ```
+  If there are multiple matches, only the first one is used with precedence based on the
+  list above.
+
+  The idea of having `index.rst` at the first place is, that it can be provided in
+  addition to a README.  This is useful if the content of the README is not suitable for
+  the documentation main page.
 - The package may contain a license file called `LICENSE` or `license.txt`.
 - C++ code is documented using Doxygen comments in the header files.
 - C++ header files are located outside of `src/` (typically in `include/`).
