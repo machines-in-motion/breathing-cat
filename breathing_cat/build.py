@@ -596,7 +596,7 @@ def _search_for_license(project_source_dir: Path, doc_build_dir: Path) -> str:
         license_include = textwrap.dedent(
             """
             License and Copyrights
-            ----------------------
+            ======================
 
             .. include:: license.txt
         """
@@ -731,8 +731,10 @@ def build_documentation(
     )
 
     # configure the index.rst.in.
-    header = "Welcome to " + project_name + "'s documentation!"
-    header += "\n" + len(header) * "=" + "\n"
+    header = f"Welcome to {project_name}'s documentation!"
+    header_line = "*" * len(header)
+    header = f"{header_line}\n{header}\n{header_line}"
+
     with open(resource_dir / "sphinx" / "index.rst.in", "rt") as f:
         out_text = (
             f.read()
