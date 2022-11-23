@@ -100,14 +100,14 @@ package:
 - If the package contains one of the following files (case insensitive) in the root
   directory, it is included into the documentations main page:
   ```
-  doc_mainpage.rst, README.rst, README.md, README.txt, README
+  doc_mainpage.rst, doc_mainpage.md, README.rst, README.md, README.txt, README
   ```
   If there are multiple matches, only the first one is used with precedence based on the
   list above.
 
-  Since `doc_mainpage.rst` has highest precedence, it can be provided in addition to a
-  README.  This is useful if you want to have different content in the README and on the
-  documentation main page.
+  Since `doc_mainpage.{rst,md}` has highest precedence, it can be provided in addition
+  to a README.  This is useful if you want to have different content in the README and
+  on the documentation main page.
 - The package may contain a license file called `LICENSE` or `license.txt`.
 - C++ code is documented using Doxygen comments in the header files.
 - C++ header files are located outside of `src/` (typically in `include/`).

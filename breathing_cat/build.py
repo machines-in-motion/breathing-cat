@@ -480,7 +480,8 @@ def _copy_mainpage(source_dir: Path, destination_dir: Path) -> FileFormat:
     """Searches for a doc_mainpage.rst or README in the source and copies it to the
     destination directory.
 
-    Searches for [doc_mainpage.rst, readme.rst, readme.md, readme.txt, readme]
+    Searches for
+    [doc_mainpage.rst, doc_mainpage.md, readme.rst, readme.md, readme.txt, readme]
     (case-insensitive) in the source directory and copies the first match to the
     destination directory.
 
@@ -499,6 +500,7 @@ def _copy_mainpage(source_dir: Path, destination_dir: Path) -> FileFormat:
     # map allowed readme file names to file format
     options: typing.Dict[str, FileFormat] = {
         "doc_mainpage.rst": "rst",
+        "doc_mainpage.md": "md",
         "readme.rst": "rst",
         "readme.md": "md",
         "readme": "txt",

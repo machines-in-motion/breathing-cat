@@ -177,6 +177,10 @@ def test_copy_mainpage_doc_mainpage_rst(tmp_path: Path) -> None:
     _test_copy_mainpage(tmp_path, "doc_mainpage.rst", "readme.rst")
 
 
+def test_copy_mainpage_doc_mainpage_md(tmp_path: Path) -> None:
+    _test_copy_mainpage(tmp_path, "doc_mainpage.md", "readme.md")
+
+
 def test_copy_mainpage_not_found(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError):
         _test_copy_mainpage(tmp_path, "wrong_name", "readme.rst")
