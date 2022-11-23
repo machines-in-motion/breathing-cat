@@ -476,7 +476,9 @@ def _search_for_general_documentation(
     return general_documentation
 
 
-def _copy_mainpage(source_dir: Path, destination_dir: Path) -> FileFormat:
+def _copy_mainpage(
+    source_dir: Path, destination_dir: Path
+) -> typing.Tuple[str, FileFormat]:
     """Searches for a doc_mainpage.rst or README in the source and copies it to the
     destination directory.
 
@@ -492,7 +494,7 @@ def _copy_mainpage(source_dir: Path, destination_dir: Path) -> FileFormat:
         destination_dir: Directory to which the README is copied.
 
     Returns:
-        Format of the README file.
+        Tuple with filename in destination_dir and format of the file ("rst", "md",...).
 
     Raises
         FileNotFoundError: If no README is found in the source directory.
@@ -519,10 +521,10 @@ def _copy_mainpage(source_dir: Path, destination_dir: Path) -> FileFormat:
 
     readme = find_matching_file()
     readme_format = options[readme.name.lower()]
-    target_filename = f"readme.{readme_format}"
+    target_filename = f"mainpage.{readme_format}"
     shutil.copy(readme, destination_dir / target_filename)
 
-    return readme_format
+    return target_filename, readme_format
 
 
 def _copy_license(source_dir: Path, destination_dir: Path) -> None:
@@ -547,7 +549,8 @@ def _copy_license(source_dir: Path, destination_dir: Path) -> None:
 
 
 def _search_for_mainpage(project_source_dir: Path, doc_build_dir: Path) -> str:
-    """Copy doc_mainpage/README file to build directory and return RST code to include it.
+    """
+    Copy doc_mainpage/README file to build directory and return RST code to include it.
 
     Args:
         project_source_dir: Where to look for the file.
@@ -558,28 +561,28 @@ def _search_for_mainpage(project_source_dir: Path, doc_build_dir: Path) -> str:
         string is return.
     """
     try:
-        readme_format = _copy_mainpage(project_source_dir, doc_build_dir)
+        mainpage, mainpage_format = _copy_mainpage(project_source_dir, doc_build_dir)
         # the include command differs depending on the format of the README
-        if readme_format == "md":
-            readme_include = textwrap.dedent(
-                """
-                .. include:: readme.md
+        if mainpage_format == "md":
+            mainpage_include = textwrap.dedent(
+                f"""
+                .. include:: {mainpage}
                    :parser: myst_parser.sphinx_
             """
             )
-        elif readme_format == "txt":
-            readme_include = textwrap.dedent(
-                """
-                .. include:: readme.txt
+        elif mainpage_format == "txt":
+            mainpage_include = textwrap.dedent(
+                f"""
+                .. include:: {mainpage}
                    :literal:
             """
             )
         else:
-            readme_include = ".. include:: readme.rst"
+            mainpage_include = f".. include:: {mainpage}"
     except FileNotFoundError:
-        readme_include = ""
+        mainpage_include = ""
 
-    return readme_include
+    return mainpage_include
 
 
 def _search_for_license(project_source_dir: Path, doc_build_dir: Path) -> str:

@@ -158,32 +158,32 @@ def _test_copy_mainpage(tmp_path: Path, filename_in: str, filename_out: str) -> 
 
 
 def test_copy_mainpage_readme(tmp_path: Path) -> None:
-    _test_copy_mainpage(tmp_path, "README", "readme.txt")
+    _test_copy_mainpage(tmp_path, "README", "mainpage.txt")
 
 
 def test_copy_mainpage_readme_txt(tmp_path: Path) -> None:
-    _test_copy_mainpage(tmp_path, "README.TXT", "readme.txt")
+    _test_copy_mainpage(tmp_path, "README.TXT", "mainpage.txt")
 
 
 def test_copy_mainpage_readme_md(tmp_path: Path) -> None:
-    _test_copy_mainpage(tmp_path, "README.md", "readme.md")
+    _test_copy_mainpage(tmp_path, "README.md", "mainpage.md")
 
 
 def test_copy_mainpage_readme_rst(tmp_path: Path) -> None:
-    _test_copy_mainpage(tmp_path, "README.rst", "readme.rst")
+    _test_copy_mainpage(tmp_path, "README.rst", "mainpage.rst")
 
 
 def test_copy_mainpage_doc_mainpage_rst(tmp_path: Path) -> None:
-    _test_copy_mainpage(tmp_path, "doc_mainpage.rst", "readme.rst")
+    _test_copy_mainpage(tmp_path, "doc_mainpage.rst", "mainpage.rst")
 
 
 def test_copy_mainpage_doc_mainpage_md(tmp_path: Path) -> None:
-    _test_copy_mainpage(tmp_path, "doc_mainpage.md", "readme.md")
+    _test_copy_mainpage(tmp_path, "doc_mainpage.md", "mainpage.md")
 
 
 def test_copy_mainpage_not_found(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError):
-        _test_copy_mainpage(tmp_path, "wrong_name", "readme.rst")
+        _test_copy_mainpage(tmp_path, "wrong_name", "mainpage.rst")
 
 
 def test_copy_mainpage_precedence(tmp_path: Path) -> None:
@@ -200,9 +200,9 @@ def test_copy_mainpage_precedence(tmp_path: Path) -> None:
     build._copy_mainpage(pkg_dir, build_dir)
     build_dir_content = [str(f.name) for f in build_dir.iterdir()]
     assert (
-        build_dir / "readme.rst"
-    ).is_file(), f"readme.rst not found.  build dir content: {build_dir_content}"
-    assert (build_dir / "readme.rst").read_text() == "This is the doc_mainpage.rst"
+        build_dir / "mainpage.rst"
+    ).is_file(), f"mainpage.rst not found.  build dir content: {build_dir_content}"
+    assert (build_dir / "mainpage.rst").read_text() == "This is the doc_mainpage.rst"
 
 
 def _test_copy_license(tmp_path: Path, filename_in: str, filename_out: str) -> None:
