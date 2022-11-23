@@ -476,11 +476,11 @@ def _search_for_general_documentation(
     return general_documentation
 
 
-def _copy_index_or_readme(source_dir: Path, destination_dir: Path) -> FileFormat:
-    """Searches for a index.rst or README file in the source and copies it to the
+def _copy_mainpage(source_dir: Path, destination_dir: Path) -> FileFormat:
+    """Searches for a doc_mainpage.rst or README in the source and copies it to the
     destination directory.
 
-    Searches for [index.rst, readme.rst, readme.md, readme.txt, readme]
+    Searches for [doc_mainpage.rst, readme.rst, readme.md, readme.txt, readme]
     (case-insensitive) in the source directory and copies the first match to the
     destination directory.
 
@@ -498,7 +498,7 @@ def _copy_index_or_readme(source_dir: Path, destination_dir: Path) -> FileFormat
     """
     # map allowed readme file names to file format
     options: typing.Dict[str, FileFormat] = {
-        "index.rst": "rst",
+        "doc_mainpage.rst": "rst",
         "readme.rst": "rst",
         "readme.md": "md",
         "readme": "txt",
@@ -513,7 +513,7 @@ def _copy_index_or_readme(source_dir: Path, destination_dir: Path) -> FileFormat
                 if file.name.lower() == candidate:
                     return file.resolve()
 
-        raise FileNotFoundError(f"No README or index file found in {source_dir}")
+        raise FileNotFoundError(f"No mainpage or README file found in {source_dir}")
 
     readme = find_matching_file()
     readme_format = options[readme.name.lower()]
@@ -544,8 +544,8 @@ def _copy_license(source_dir: Path, destination_dir: Path) -> None:
     shutil.copy(license_file[0], destination_dir / "license.txt")
 
 
-def _search_for_index_or_readme(project_source_dir: Path, doc_build_dir: Path) -> str:
-    """Copy index/README file to build directory and return RST code to include it.
+def _search_for_mainpage(project_source_dir: Path, doc_build_dir: Path) -> str:
+    """Copy doc_mainpage/README file to build directory and return RST code to include it.
 
     Args:
         project_source_dir: Where to look for the file.
@@ -556,7 +556,7 @@ def _search_for_index_or_readme(project_source_dir: Path, doc_build_dir: Path) -
         string is return.
     """
     try:
-        readme_format = _copy_index_or_readme(project_source_dir, doc_build_dir)
+        readme_format = _copy_mainpage(project_source_dir, doc_build_dir)
         # the include command differs depending on the format of the README
         if readme_format == "md":
             readme_include = textwrap.dedent(
@@ -718,7 +718,7 @@ def build_documentation(
     #
     # Copy the license and readme file.
     #
-    readme_include = _search_for_index_or_readme(project_source_dir, doc_build_dir)
+    readme_include = _search_for_mainpage(project_source_dir, doc_build_dir)
     license_include = _search_for_license(project_source_dir, doc_build_dir)
 
     #

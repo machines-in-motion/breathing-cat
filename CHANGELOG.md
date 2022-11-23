@@ -6,9 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- If the package root contains a file `index.rst`, it is used instead of the README to
-  fill the main page.  This is useful if the content of the README is not suitable for
-  the documentation main page.
+- If the package root contains a file `doc_mainpage.rst`, it is used instead of the
+  README to fill the main page.  This is useful if the content of the README is not
+  suitable for the documentation main page.
 
 ## [1.1.1] - 2022-11-11
 ### Fixed

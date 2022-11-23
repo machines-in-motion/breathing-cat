@@ -141,7 +141,7 @@ def test_search_for_general_documentation(ros_pkg_path: Path, tmp_path: Path) ->
     assert "@" not in general_doc_content
 
 
-def _test_copy_readme(tmp_path: Path, filename_in: str, filename_out: str) -> None:
+def _test_copy_mainpage(tmp_path: Path, filename_in: str, filename_out: str) -> None:
     build_dir = tmp_path / "build"
     build_dir.mkdir()
     pkg_dir = tmp_path / "pkg"
@@ -149,7 +149,7 @@ def _test_copy_readme(tmp_path: Path, filename_in: str, filename_out: str) -> No
     readme = pkg_dir / filename_in
     readme.write_text("Hello")
 
-    build._copy_index_or_readme(pkg_dir, build_dir)
+    build._copy_mainpage(pkg_dir, build_dir)
     build_dir_content = [str(f.name) for f in build_dir.iterdir()]
     assert (
         build_dir / filename_out
@@ -157,32 +157,32 @@ def _test_copy_readme(tmp_path: Path, filename_in: str, filename_out: str) -> No
     assert (build_dir / filename_out).read_text() == "Hello"
 
 
-def test_copy_readme(tmp_path: Path) -> None:
-    _test_copy_readme(tmp_path, "README", "readme.txt")
+def test_copy_mainpage_readme(tmp_path: Path) -> None:
+    _test_copy_mainpage(tmp_path, "README", "readme.txt")
 
 
-def test_copy_readme_txt(tmp_path: Path) -> None:
-    _test_copy_readme(tmp_path, "README.TXT", "readme.txt")
+def test_copy_mainpage_readme_txt(tmp_path: Path) -> None:
+    _test_copy_mainpage(tmp_path, "README.TXT", "readme.txt")
 
 
-def test_copy_readme_md(tmp_path: Path) -> None:
-    _test_copy_readme(tmp_path, "README.md", "readme.md")
+def test_copy_mainpage_readme_md(tmp_path: Path) -> None:
+    _test_copy_mainpage(tmp_path, "README.md", "readme.md")
 
 
-def test_copy_readme_rst(tmp_path: Path) -> None:
-    _test_copy_readme(tmp_path, "README.rst", "readme.rst")
+def test_copy_mainpage_readme_rst(tmp_path: Path) -> None:
+    _test_copy_mainpage(tmp_path, "README.rst", "readme.rst")
 
 
-def test_copy_readme_index_rst(tmp_path: Path) -> None:
-    _test_copy_readme(tmp_path, "index.rst", "readme.rst")
+def test_copy_mainpage_doc_mainpage_rst(tmp_path: Path) -> None:
+    _test_copy_mainpage(tmp_path, "doc_mainpage.rst", "readme.rst")
 
 
-def test_copy_readme_not_found(tmp_path: Path) -> None:
+def test_copy_mainpage_not_found(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError):
-        _test_copy_readme(tmp_path, "wrong_name", "readme.rst")
+        _test_copy_mainpage(tmp_path, "wrong_name", "readme.rst")
 
 
-def test_copy_index_or_readme_precedence(tmp_path: Path) -> None:
+def test_copy_mainpage_precedence(tmp_path: Path) -> None:
     build_dir = tmp_path / "build"
     build_dir.mkdir()
     pkg_dir = tmp_path / "pkg"
@@ -190,15 +190,15 @@ def test_copy_index_or_readme_precedence(tmp_path: Path) -> None:
 
     readme = pkg_dir / "README.rst"
     readme.write_text("This is the README")
-    index_rst = pkg_dir / "index.rst"
-    index_rst.write_text("This is the index.rst")
+    mainpage_rst = pkg_dir / "doc_mainpage.rst"
+    mainpage_rst.write_text("This is the doc_mainpage.rst")
 
-    build._copy_index_or_readme(pkg_dir, build_dir)
+    build._copy_mainpage(pkg_dir, build_dir)
     build_dir_content = [str(f.name) for f in build_dir.iterdir()]
     assert (
         build_dir / "readme.rst"
     ).is_file(), f"readme.rst not found.  build dir content: {build_dir_content}"
-    assert (build_dir / "readme.rst").read_text() == "This is the index.rst"
+    assert (build_dir / "readme.rst").read_text() == "This is the doc_mainpage.rst"
 
 
 def _test_copy_license(tmp_path: Path, filename_in: str, filename_out: str) -> None:
