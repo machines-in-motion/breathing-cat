@@ -12,6 +12,11 @@ def ros_pkg_path() -> Path:
     return Path(__file__).parent / "test_packages" / "ros_pkg"
 
 
+@pytest.fixture
+def test_configs():
+    return Path(__file__).parent / "config"
+
+
 def test_resource_path() -> None:
     path = build._resource_path()
     # validate the path by checking for existence of a few files that should be there
@@ -263,12 +268,38 @@ def test_construct_intersphinx_mapping_config() -> None:
         )
 
 
-def test_build_documentation(tmp_path, ros_pkg_path):
+def test_build_documentation_default(tmp_path, ros_pkg_path):
     # just a very basic test if index.html is created
     build.build_documentation(tmp_path, ros_pkg_path, "1.2.3")
-    assert (tmp_path / "html/index.html").exists()
+
+    index_html_file = tmp_path / "html/index.html"
+    assert index_html_file.exists()
+    index_html_content = index_html_file.read_text()
+    # verify the mainpage title
+    assert "Welcome to ros_pkg’s documentation!" in index_html_content
+    # verify General Documentation is there
+    assert "General Documentation" in index_html_content
 
     # verify all @VARIABLES@ in indes.rst.in have been substituted
-    index_file = tmp_path / "index.rst"
-    index_content = index_file.read_text()
-    assert "@" not in index_content
+    index_rst_file = tmp_path / "index.rst"
+    index_rst_content = index_rst_file.read_text()
+    assert "@" not in index_rst_content
+
+
+def test_build_documentation_mainpage_config(tmp_path, ros_pkg_path, test_configs):
+    # just a very basic test if index.html is created
+    build.build_documentation(
+        tmp_path,
+        ros_pkg_path,
+        "1.2.3",
+        config_file=test_configs / "mainpage_config.toml",
+    )
+
+    index_html_file = tmp_path / "html/index.html"
+    assert index_html_file.exists()
+    index_html_content = index_html_file.read_text()
+    # verify the mainpage title
+    assert "Welcome to ros_pkg’s documentation!" not in index_html_content
+    assert "Custom Title" in index_html_content
+    # verify General Documentation is not there
+    assert "General Documentation" not in index_html_content
