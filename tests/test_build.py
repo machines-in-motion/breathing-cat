@@ -130,16 +130,25 @@ def test_search_for_cmake_api(ros_pkg_path: Path, tmp_path: Path) -> None:
     assert "@" not in cmake_doc_content
 
 
-def test_search_for_general_documentation(ros_pkg_path: Path, tmp_path: Path) -> None:
+def test_copy_general_documentation(ros_pkg_path: Path, tmp_path: Path) -> None:
+    build_dir = tmp_path
+
+    build._copy_general_documentation(ros_pkg_path, build_dir)
+
+    assert (build_dir / "doc/getting_started.rst").is_file()
+    assert (build_dir / "doc/contribute.md").is_file()
+
+
+def test_create_general_documentation_toctree(
+    ros_pkg_path: Path, tmp_path: Path
+) -> None:
     build_dir = tmp_path
 
     resource_dir = build._resource_path()
-    build._search_for_general_documentation(build_dir, ros_pkg_path, resource_dir)
+    build._create_general_documentation_toctree(build_dir, ros_pkg_path, resource_dir)
 
     general_doc_file = build_dir / "general_documentation.rst"
     assert general_doc_file.is_file()
-    assert (build_dir / "doc/getting_started.rst").is_file()
-    assert (build_dir / "doc/contribute.md").is_file()
 
     # verify all @VARIABLES@ have been substituted
     general_doc_content = general_doc_file.read_text()

@@ -438,14 +438,10 @@ def _search_for_cmake_api(
     return cmake_api
 
 
-def _search_for_general_documentation(
-    doc_build_dir: Path, project_source_dir: Path, resource_dir: Path
-) -> str:
-    general_documentation = ""
-
+def _copy_general_documentation(source_dir: Path, destination_dir: Path) -> None:
     doc_path_candidates = [
-        project_source_dir / "doc",
-        project_source_dir / "docs",
+        source_dir / "doc",
+        source_dir / "docs",
     ]
     doc_path = None
     for p in doc_path_candidates:
@@ -453,26 +449,33 @@ def _search_for_general_documentation(
             doc_path = p
             break
 
-    # Search for additional doc.
-    if doc_path:
-        general_documentation = textwrap.dedent(
-            """
-            .. toctree::
-               :caption: General Documentation
-               :maxdepth: 2
+    if not doc_path:
+        raise FileNotFoundError(f"No doc[s]/ folder found in {source_dir}.")
 
-               general_documentation
+    shutil.copytree(
+        doc_path,
+        destination_dir / "doc",
+    )
 
+
+def _create_general_documentation_toctree(
+    doc_build_dir: Path, project_source_dir: Path, resource_dir: Path
+) -> str:
+    general_documentation = textwrap.dedent(
         """
-        )
-        shutil.copy(
-            resource_dir / "sphinx" / "general_documentation.rst.in",
-            doc_build_dir / "general_documentation.rst",
-        )
-        shutil.copytree(
-            doc_path,
-            doc_build_dir / "doc",
-        )
+        .. toctree::
+           :caption: General Documentation
+           :maxdepth: 2
+
+           general_documentation
+
+    """
+    )
+    shutil.copy(
+        resource_dir / "sphinx" / "general_documentation.rst.in",
+        doc_build_dir / "general_documentation.rst",
+    )
+
     return general_documentation
 
 
@@ -716,9 +719,16 @@ def build_documentation(
 
     cmake_api = _search_for_cmake_api(doc_build_dir, project_source_dir, resource_dir)
 
-    general_documentation = _search_for_general_documentation(
-        doc_build_dir, project_source_dir, resource_dir
-    )
+    general_documentation = ""
+    try:
+        _copy_general_documentation(project_source_dir, doc_build_dir)
+
+        if config["mainpage"]["auto_general_docs"]:
+            general_documentation = _create_general_documentation_toctree(
+                doc_build_dir, project_source_dir, resource_dir
+            )
+    except FileNotFoundError:
+        pass  # simply don't add general documentation if no doc files exist
 
     #
     # Copy the license and readme file.
