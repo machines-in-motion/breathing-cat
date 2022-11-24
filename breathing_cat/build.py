@@ -736,7 +736,9 @@ def build_documentation(
     )
 
     # configure the index.rst.in.
-    header = f"Welcome to {project_name}'s documentation!"
+    header = (
+        config["mainpage"]["title"] or f"Welcome to {project_name}'s documentation!"
+    )
     header_line = "*" * len(header)
     header = f"{header_line}\n{header}\n{header_line}"
 
