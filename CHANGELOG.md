@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - If the package root contains a file `doc_mainpage.{rst,md}`, it is used instead of the
   README to fill the main page.  This is useful if the content of the README is not
   suitable for the documentation main page.
+- Add config parameter `mainpage.title` to set a custom title.
+- Add config parameter `mainpage.auto_general_docs` to disable automatic creation of a
+  toctree for files in `doc/`.
 
 ## [1.1.1] - 2022-11-11
 ### Fixed
