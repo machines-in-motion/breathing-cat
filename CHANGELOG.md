@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add config parameter `mainpage.title` to set a custom title.
 - Add config parameter `mainpage.auto_general_docs` to disable automatic creation of a
   toctree for files in `doc/`.
+- Mark external links with an icon (sphinx-rtd-theme setting `style_external_links`).
 
 ## [1.1.1] - 2022-11-11
 ### Fixed
