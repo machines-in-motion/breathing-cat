@@ -723,7 +723,7 @@ def build_documentation(
     #
     # Copy the license and readme file.
     #
-    readme_include = _search_for_mainpage(project_source_dir, doc_build_dir)
+    mainpage_include = _search_for_mainpage(project_source_dir, doc_build_dir)
     license_include = _search_for_license(project_source_dir, doc_build_dir)
 
     #
@@ -744,7 +744,7 @@ def build_documentation(
         out_text = (
             f.read()
             .replace("@HEADER@", header)
-            .replace("@README@", readme_include)
+            .replace("@MAINPAGE@", mainpage_include)
             .replace("@GENERAL_DOCUMENTATION@", general_documentation)
             .replace("@CPP_API@", cpp_api)
             .replace("@PYTHON_API@", python_api)
