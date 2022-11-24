@@ -8,7 +8,6 @@ import fnmatch
 import os
 import shutil
 import subprocess
-import sys
 import textwrap
 import typing
 from pathlib import Path
@@ -477,45 +476,55 @@ def _search_for_general_documentation(
     return general_documentation
 
 
-def _copy_readme(source_dir: Path, destination_dir: Path) -> FileFormat:
-    """Searches for a README in the source and copies it to the destination directory .
+def _copy_mainpage(
+    source_dir: Path, destination_dir: Path
+) -> typing.Tuple[str, FileFormat]:
+    """Searches for a doc_mainpage.rst or README in the source and copies it to the
+    destination directory.
 
-    Searches for a "README.md" or "README.rst" (case-insensitive) in the source
-    directory and copies it to the destination directory.  Returns the format of the
-    file.
+    Searches for
+    [doc_mainpage.rst, doc_mainpage.md, readme.rst, readme.md, readme.txt, readme]
+    (case-insensitive) in the source directory and copies the first match to the
+    destination directory.
+
+    Returns the format of the file (for example "rst").
 
     Args:
         source_dir: Where to look for the README file.
         destination_dir: Directory to which the README is copied.
 
     Returns:
-        Format of the README file.
+        Tuple with filename in destination_dir and format of the file ("rst", "md",...).
 
     Raises
         FileNotFoundError: If no README is found in the source directory.
     """
     # map allowed readme file names to file format
     options: typing.Dict[str, FileFormat] = {
-        "readme.md": "md",
+        "doc_mainpage.rst": "rst",
+        "doc_mainpage.md": "md",
         "readme.rst": "rst",
+        "readme.md": "md",
         "readme": "txt",
         "readme.txt": "txt",
     }
 
-    readmes = [p.resolve() for p in source_dir.glob("*") if p.name.lower() in options]
-    if not readmes:
-        raise FileNotFoundError(f"No README file found in {source_dir}")
+    root_files = [p for p in source_dir.iterdir() if p.is_file()]
 
-    # if multiple READMEs are found, print warning and use the first one that was found
-    if len(readmes) > 1:
-        print(f"WARNING: Found multiple README files in {source_dir}.", file=sys.stderr)
+    def find_matching_file():
+        for candidate in options:
+            for file in root_files:
+                if file.name.lower() == candidate:
+                    return file.resolve()
 
-    readme = readmes[0]
+        raise FileNotFoundError(f"No mainpage or README file found in {source_dir}")
+
+    readme = find_matching_file()
     readme_format = options[readme.name.lower()]
-    target_filename = f"readme.{readme_format}"
+    target_filename = f"mainpage.{readme_format}"
     shutil.copy(readme, destination_dir / target_filename)
 
-    return readme_format
+    return target_filename, readme_format
 
 
 def _copy_license(source_dir: Path, destination_dir: Path) -> None:
@@ -539,40 +548,41 @@ def _copy_license(source_dir: Path, destination_dir: Path) -> None:
     shutil.copy(license_file[0], destination_dir / "license.txt")
 
 
-def _search_for_readme(project_source_dir: Path, doc_build_dir: Path) -> str:
-    """Copy README file to build directory and return RST code to include it.
+def _search_for_mainpage(project_source_dir: Path, doc_build_dir: Path) -> str:
+    """
+    Copy doc_mainpage/README file to build directory and return RST code to include it.
 
     Args:
         project_source_dir: Where to look for the file.
         doc_build_dir: Directory to which the is copied.
 
     Returns:
-        RST snippet for including the README.  In case no README is found an empty
+        RST snippet for including the file.  In case none is found an empty
         string is return.
     """
     try:
-        readme_format = _copy_readme(project_source_dir, doc_build_dir)
+        mainpage, mainpage_format = _copy_mainpage(project_source_dir, doc_build_dir)
         # the include command differs depending on the format of the README
-        if readme_format == "md":
-            readme_include = textwrap.dedent(
-                """
-                .. include:: readme.md
+        if mainpage_format == "md":
+            mainpage_include = textwrap.dedent(
+                f"""
+                .. include:: {mainpage}
                    :parser: myst_parser.sphinx_
             """
             )
-        elif readme_format == "txt":
-            readme_include = textwrap.dedent(
-                """
-                .. include:: readme.txt
+        elif mainpage_format == "txt":
+            mainpage_include = textwrap.dedent(
+                f"""
+                .. include:: {mainpage}
                    :literal:
             """
             )
         else:
-            readme_include = ".. include:: readme.rst"
+            mainpage_include = f".. include:: {mainpage}"
     except FileNotFoundError:
-        readme_include = ""
+        mainpage_include = ""
 
-    return readme_include
+    return mainpage_include
 
 
 def _search_for_license(project_source_dir: Path, doc_build_dir: Path) -> str:
@@ -591,7 +601,7 @@ def _search_for_license(project_source_dir: Path, doc_build_dir: Path) -> str:
         license_include = textwrap.dedent(
             """
             License and Copyrights
-            ----------------------
+            ======================
 
             .. include:: license.txt
         """
@@ -713,7 +723,7 @@ def build_documentation(
     #
     # Copy the license and readme file.
     #
-    readme_include = _search_for_readme(project_source_dir, doc_build_dir)
+    readme_include = _search_for_mainpage(project_source_dir, doc_build_dir)
     license_include = _search_for_license(project_source_dir, doc_build_dir)
 
     #
@@ -726,8 +736,10 @@ def build_documentation(
     )
 
     # configure the index.rst.in.
-    header = "Welcome to " + project_name + "'s documentation!"
-    header += "\n" + len(header) * "=" + "\n"
+    header = f"Welcome to {project_name}'s documentation!"
+    header_line = "*" * len(header)
+    header = f"{header_line}\n{header}\n{header_line}"
+
     with open(resource_dir / "sphinx" / "index.rst.in", "rt") as f:
         out_text = (
             f.read()
