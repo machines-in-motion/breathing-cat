@@ -267,3 +267,8 @@ def test_build_documentation(tmp_path, ros_pkg_path):
     # just a very basic test if index.html is created
     build.build_documentation(tmp_path, ros_pkg_path, "1.2.3")
     assert (tmp_path / "html/index.html").exists()
+
+    # verify all @VARIABLES@ in indes.rst.in have been substituted
+    index_file = tmp_path / "index.rst"
+    index_content = index_file.read_text()
+    assert "@" not in index_content
