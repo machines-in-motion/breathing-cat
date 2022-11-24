@@ -12,6 +12,11 @@ def ros_pkg_path() -> Path:
     return Path(__file__).parent / "test_packages" / "ros_pkg"
 
 
+@pytest.fixture
+def test_configs():
+    return Path(__file__).parent / "config"
+
+
 def test_resource_path() -> None:
     path = build._resource_path()
     # validate the path by checking for existence of a few files that should be there
@@ -125,16 +130,25 @@ def test_search_for_cmake_api(ros_pkg_path: Path, tmp_path: Path) -> None:
     assert "@" not in cmake_doc_content
 
 
-def test_search_for_general_documentation(ros_pkg_path: Path, tmp_path: Path) -> None:
+def test_copy_general_documentation(ros_pkg_path: Path, tmp_path: Path) -> None:
+    build_dir = tmp_path
+
+    build._copy_general_documentation(ros_pkg_path, build_dir)
+
+    assert (build_dir / "doc/getting_started.rst").is_file()
+    assert (build_dir / "doc/contribute.md").is_file()
+
+
+def test_create_general_documentation_toctree(
+    ros_pkg_path: Path, tmp_path: Path
+) -> None:
     build_dir = tmp_path
 
     resource_dir = build._resource_path()
-    build._search_for_general_documentation(build_dir, ros_pkg_path, resource_dir)
+    build._create_general_documentation_toctree(build_dir, ros_pkg_path, resource_dir)
 
     general_doc_file = build_dir / "general_documentation.rst"
     assert general_doc_file.is_file()
-    assert (build_dir / "doc/getting_started.rst").is_file()
-    assert (build_dir / "doc/contribute.md").is_file()
 
     # verify all @VARIABLES@ have been substituted
     general_doc_content = general_doc_file.read_text()
@@ -263,7 +277,38 @@ def test_construct_intersphinx_mapping_config() -> None:
         )
 
 
-def test_build_documentation(tmp_path, ros_pkg_path):
+def test_build_documentation_default(tmp_path, ros_pkg_path):
     # just a very basic test if index.html is created
     build.build_documentation(tmp_path, ros_pkg_path, "1.2.3")
-    assert (tmp_path / "html/index.html").exists()
+
+    index_html_file = tmp_path / "html/index.html"
+    assert index_html_file.exists()
+    index_html_content = index_html_file.read_text()
+    # verify the mainpage title
+    assert "Welcome to ros_pkg’s documentation!" in index_html_content
+    # verify General Documentation is there
+    assert "General Documentation" in index_html_content
+
+    # verify all @VARIABLES@ in indes.rst.in have been substituted
+    index_rst_file = tmp_path / "index.rst"
+    index_rst_content = index_rst_file.read_text()
+    assert "@" not in index_rst_content
+
+
+def test_build_documentation_mainpage_config(tmp_path, ros_pkg_path, test_configs):
+    # just a very basic test if index.html is created
+    build.build_documentation(
+        tmp_path,
+        ros_pkg_path,
+        "1.2.3",
+        config_file=test_configs / "mainpage_config.toml",
+    )
+
+    index_html_file = tmp_path / "html/index.html"
+    assert index_html_file.exists()
+    index_html_content = index_html_file.read_text()
+    # verify the mainpage title
+    assert "Welcome to ros_pkg’s documentation!" not in index_html_content
+    assert "Custom Title" in index_html_content
+    # verify General Documentation is not there
+    assert "General Documentation" not in index_html_content

@@ -87,6 +87,19 @@ exclude_patterns = []
 #
 # 2. # Short notation (results in `'foo': ('docs.foo.org', None):
 # foo = "docs.foo.org"
+
+
+[mainpage]
+# Custom title for the main page.  If not set "Welcome to {package}'s documentation!" is
+# used.
+# Example:
+# title = "Custom Mainpage Title"
+title = ""
+
+# Automatically add files from the doc/ folder to a toctree, thus including them in the
+# documentation.  Set this to false if you want to manually provide a toctree in the
+# doc_mainpage or README file.
+auto_general_docs = true
 ```
 
 
@@ -126,7 +139,9 @@ package:
   extension.
 - General documentation is provided in reStructuredText- or Markdown-files located in
   `doc/` or `docs/`.  All files found in this directory are automatically included in
-  alphabetical order.
+  alphabetical order.  This can be disabled via the config parameter
+  `mainpage.auto_general_docs` (see above) in case you want to manually provide a
+  toctree.
 
 
 Copyright & License

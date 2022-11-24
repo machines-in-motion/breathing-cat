@@ -17,6 +17,10 @@ _DEFAULT_CONFIG: typing.Dict[str, typing.Any] = {
         "exclude_patterns": [],
     },
     "intersphinx": {"mapping": {}},
+    "mainpage": {
+        "title": None,
+        "auto_general_docs": True,
+    },
 }
 
 
