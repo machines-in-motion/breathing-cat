@@ -59,6 +59,28 @@ def test_find_and_load_config_intersphinx(test_data):
     }
 
 
+def test_config_from_dict_mainpage(test_data):
+    """Test loading a config file with load_config()."""
+    cfg1 = config.config_from_dict({})
+    assert cfg1["mainpage"] == {
+        "title": None,
+        "auto_general_docs": True,
+    }
+
+    cfg2 = config.config_from_dict(
+        {
+            "mainpage": {
+                "title": "Custom Title",
+                "auto_general_docs": False,
+            },
+        }
+    )
+    assert cfg2["mainpage"] == {
+        "title": "Custom Title",
+        "auto_general_docs": False,
+    }
+
+
 def _setup_pkg_dir_with_config(config_location, tmp_path, test_data):
     """Helper for the test_find_and_load_config_* functions."""
     # create target directory
