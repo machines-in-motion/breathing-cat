@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Config parameter `html.logo` to specify an image that is shown in the top of
   the navigation bar.
 
+### Changed
+- Private members of C++ classes are not shown anymore.  This affects the
+  auto-generated API documentation as well as usages of `.. doxygenclass::` in
+  the general documentation.  In the latter they can be added back if desired by
+  specifying `:private-members:`.
+
 
 ## [1.2.0] - 2022-11-24
 ### Added

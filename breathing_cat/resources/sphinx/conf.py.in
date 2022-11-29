@@ -67,7 +67,7 @@ templates_path = ["_templates"]
 # breath extension management
 breathe_projects = {project: "@DOXYGEN_XML_OUTPUT@"}
 breathe_default_project = project
-breathe_default_members = ("members", "private-members", "undoc-members")
+breathe_default_members = ("members", "undoc-members")
 
 # cmake parsing
 # primary_domain = 'cmake'
