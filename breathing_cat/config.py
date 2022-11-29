@@ -21,6 +21,9 @@ _DEFAULT_CONFIG: typing.Dict[str, typing.Any] = {
         "title": None,
         "auto_general_docs": True,
     },
+    "html": {
+        "logo": "",
+    },
 }
 
 

@@ -89,6 +89,15 @@ exclude_patterns = []
 # foo = "docs.foo.org"
 
 
+[html]
+# Path to an image that is shown at the top of the navigation bar.
+# The image should be located inside the "doc/" folder and the path given relative to
+# the package root.
+# Example:
+# logo = "doc/images/logo.png"
+logo = ""
+
+
 [mainpage]
 # Custom title for the main page.  If not set "Welcome to {package}'s documentation!" is
 # used.

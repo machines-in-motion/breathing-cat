@@ -775,6 +775,7 @@ def build_documentation(
             .replace("@PROJECT_VERSION@", project_version)
             .replace("@DOXYGEN_XML_OUTPUT@", str(doc_build_dir / "doxygen" / "xml"))
             .replace("@INTERSPHINX_MAPPING@", intersphinx_mapping)
+            .replace("@LOGO@", config["html"]["logo"])
         )
     with open(doc_build_dir / "conf.py", "wt") as f:
         f.write(out_text)
