@@ -16,7 +16,8 @@ from . import config as _config
 
 
 PathLike = typing.Union[str, os.PathLike]
-FileFormat = typing.Literal["md", "rst", "txt"]
+# FileFormat = typing.Literal["md", "rst", "txt"]
+FileFormat = typing.Any
 
 
 def _get_cpp_file_patterns() -> typing.List[str]:
@@ -620,7 +621,7 @@ def _construct_intersphinx_mapping_config(
         str,
         typing.Union[
             str,
-            typing.Mapping[typing.Literal["target", "inventory"], typing.Optional[str]],
+            typing.Mapping[str, typing.Optional[str]],
         ],
     ]
 ) -> str:
