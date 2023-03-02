@@ -3,28 +3,37 @@
 License BSD-3-Clause
 Copyright (c) 2021, New York University and Max Planck Gesellschaft.
 """
+from __future__ import annotations
+
 import collections.abc
 import fnmatch
 import os
 import shutil
 import subprocess
 import textwrap
-import typing
+import typing as t
 from pathlib import Path
 
 from . import config as _config
 
+if t.TYPE_CHECKING:
+    StrPath = t.Union[str, os.PathLike[str]]
+    FileFormat = t.Literal["md", "rst", "txt"]
 
-PathLike = typing.Union[str, os.PathLike]
-FileFormat = typing.Literal["md", "rst", "txt"]
+
+class ExecutableNotFoundError(RuntimeError):
+    """Error indicating that an executable has not been found."""
 
 
-def _get_cpp_file_patterns() -> typing.List[str]:
+def _get_cpp_file_patterns() -> t.List[str]:
     return ["*.h", "*.hh", "*.hpp", "*.hxx", "*.cpp", "*.c", "*.cc"]
 
 
-def _find_doxygen() -> str:
+def _find_doxygen(path: t.Optional[StrPath] = None) -> str:
     """Find the full path to the doxygen executable.
+
+    Args:
+        path: Optional search path.  If not set the $PATH environment variable is used.
 
     Raises:
         Exception: if the doxygen executable is not found.
@@ -32,16 +41,19 @@ def _find_doxygen() -> str:
     Returns:
         The full path to the doxygen executable.
     """
-    exec_path = shutil.which("doxygen")
+    exec_path = shutil.which("doxygen", path=path)
     if exec_path is not None:
         return exec_path
-    raise Exception(
-        "doxygen executable not found. You may try " "'(sudo ) apt install doxygen*'"
+    raise ExecutableNotFoundError(
+        "doxygen executable not found. You may try '(sudo ) apt install doxygen*'"
     )
 
 
-def _find_breathe_apidoc() -> str:
+def _find_breathe_apidoc(path: t.Optional[StrPath] = None) -> str:
     """Find the full path to the breathe-apidoc executable.
+
+    Args:
+        path: Optional search path.  If not set the $PATH environment variable is used.
 
     Raises:
         Exception: if the breathe-apidoc executable is not found.
@@ -49,17 +61,20 @@ def _find_breathe_apidoc() -> str:
     Returns:
         The full path to the black executable.
     """
-    exec_path = shutil.which("breathe-apidoc")
+    exec_path = shutil.which("breathe-apidoc", path=path)
     if exec_path is not None:
         return exec_path
-    raise Exception(
+    raise ExecutableNotFoundError(
         "breathe-apidoc executable not found. You may try "
         "'(sudo -H) pip3 install breathe'"
     )
 
 
-def _find_sphinx_apidoc() -> str:
+def _find_sphinx_apidoc(path: t.Optional[StrPath] = None) -> str:
     """Find the full path to the sphinx-apidoc executable.
+
+    Args:
+        path: Optional search path.  If not set the $PATH environment variable is used.
 
     Raises:
         Exception: if the sphinx-apidoc executable is not found.
@@ -67,17 +82,20 @@ def _find_sphinx_apidoc() -> str:
     Returns:
         The full path to the black executable.
     """
-    exec_path = shutil.which("sphinx-apidoc")
+    exec_path = shutil.which("sphinx-apidoc", path=path)
     if exec_path is not None:
         return exec_path
-    raise Exception(
+    raise ExecutableNotFoundError(
         "sphinx-apidoc executable not found. You may try "
         "'(sudo -H) pip3 install sphinx'"
     )
 
 
-def _find_sphinx_build() -> str:
+def _find_sphinx_build(path: t.Optional[StrPath] = None) -> str:
     """Find the full path to the sphinx-build executable.
+
+    Args:
+        path: Optional search path.  If not set the $PATH environment variable is used.
 
     Raises:
         Exception: if the sphinx-build executable is not found.
@@ -85,11 +103,11 @@ def _find_sphinx_build() -> str:
     Returns:
         The full path to the black executable.
     """
-    exec_path = shutil.which("sphinx-build")
+    exec_path = shutil.which("sphinx-build", path=path)
     if exec_path is not None:
         return exec_path
 
-    raise Exception(
+    raise ExecutableNotFoundError(
         "sphinx-build executable not found. You may try "
         "'(sudo -H) pip3 install sphinx'"
     )
@@ -115,7 +133,7 @@ def _resource_path() -> Path:
 
 
 def _prepare_doxygen_exclude_patterns(
-    project_source_dir: Path, doxygen_config: typing.Mapping
+    project_source_dir: Path, doxygen_config: t.Mapping
 ) -> str:
     """Convert the doxygen exclude patterns config into a string for Doxyfile.
 
@@ -140,7 +158,7 @@ def _prepare_doxygen_exclude_patterns(
 
 
 def _build_doxygen_xml(
-    doc_build_dir: Path, project_source_dir: Path, doxygen_config: typing.Mapping
+    doc_build_dir: Path, project_source_dir: Path, doxygen_config: t.Mapping
 ) -> None:
     """
     Use doxygen to parse the C++ source files and generate a corresponding xml
@@ -189,11 +207,13 @@ def _build_doxygen_xml(
     with open(doxyfile_out, "wt") as f:
         f.write(doxyfile_out_text)
 
-    bashCommand = doxygen + " " + str(doxyfile_out)
+    command = doxygen + " " + str(doxyfile_out)
     process = subprocess.Popen(
-        bashCommand.split(), stdout=subprocess.PIPE, cwd=str(doxygen_output)
+        command.split(), stdout=subprocess.PIPE, cwd=str(doxygen_output)
     )
     output, error = process.communicate()
+    print("\n------------------------------------------------------------------")
+    print("$ {}\n\n".format(command))
     print("Doxygen output:\n", output.decode("UTF-8"))
     print("Doxygen error:\n", error)
     print("")
@@ -212,7 +232,7 @@ def _build_breath_api_doc(doc_build_dir: Path) -> None:
     breathe_output = doc_build_dir / "breathe_apidoc"
     breathe_option = "-f -g class,interface,struct,union,file,namespace,group"
 
-    bashCommand = (
+    command = (
         breathe_apidoc
         + " -o "
         + str(breathe_output)
@@ -222,9 +242,11 @@ def _build_breath_api_doc(doc_build_dir: Path) -> None:
         + str(breathe_option)
     )
     process = subprocess.Popen(
-        bashCommand.split(), stdout=subprocess.PIPE, cwd=str(doc_build_dir)
+        command.split(), stdout=subprocess.PIPE, cwd=str(doc_build_dir)
     )
     output, error = process.communicate()
+    print("\n------------------------------------------------------------------")
+    print("$ {}\n\n".format(command))
     print("breathe-apidoc output:\n", output.decode("UTF-8"))
     print("breathe-apidoc error:\n", error)
     print("")
@@ -236,8 +258,8 @@ def _build_sphinx_api_doc(doc_build_dir: Path, python_source_dir: Path) -> None:
     generate '.rst' files.
 
     Args:
-        doc_build_dir (str): Path where to create the temporary output.
-        project_source_dir (str): Path to the source file of the project.
+        doc_build_dir: Path where to create the temporary output.
+        python_source_dir: Path to the Python source files of the project.
     """
     # define input folder
     if python_source_dir.is_dir():
@@ -245,7 +267,7 @@ def _build_sphinx_api_doc(doc_build_dir: Path, python_source_dir: Path) -> None:
         sphinx_apidoc_input = str(python_source_dir)
         sphinx_apidoc_output = str(doc_build_dir)
 
-        bashCommand = (
+        command = (
             sphinx_apidoc
             + " --separate "
             + " -o "
@@ -254,9 +276,11 @@ def _build_sphinx_api_doc(doc_build_dir: Path, python_source_dir: Path) -> None:
             + sphinx_apidoc_input
         )
         process = subprocess.Popen(
-            bashCommand.split(), stdout=subprocess.PIPE, cwd=str(doc_build_dir)
+            command.split(), stdout=subprocess.PIPE, cwd=str(doc_build_dir)
         )
         output, error = process.communicate()
+        print("\n------------------------------------------------------------------")
+        print("$ {}\n\n".format(command))
         print("sphinx-apidoc output:\n", output.decode("UTF-8"))
         print("sphinx-apidoc error:\n", error)
 
@@ -274,22 +298,22 @@ def _build_sphinx_build(doc_build_dir: Path) -> None:
         doc_build_dir (str): Path where to create the temporary output.
     """
     sphinx_build = _find_sphinx_build()
-    bashCommand = (
-        sphinx_build + " -M html " + str(doc_build_dir) + " " + str(doc_build_dir)
-    )
+    command = sphinx_build + " -M html " + str(doc_build_dir) + " " + str(doc_build_dir)
     process = subprocess.Popen(
-        bashCommand.split(), stdout=subprocess.PIPE, cwd=str(doc_build_dir)
+        command.split(), stdout=subprocess.PIPE, cwd=str(doc_build_dir)
     )
     output, error = process.communicate()
-    print("sphinx-apidoc output:\n", output.decode("UTF-8"))
-    print("sphinx-apidoc error:\n", error)
+    print("\n------------------------------------------------------------------")
+    print("$ {}\n\n".format(command))
+    print("sphinx-build output:\n", output.decode("UTF-8"))
+    print("sphinx-build error:\n", error)
 
 
 def _search_for_cpp_api(
     doc_build_dir: Path,
     project_source_dir: Path,
     resource_dir: Path,
-    config: typing.Mapping,
+    config: t.Mapping,
 ) -> str:
     """Search if there is a C++ api do document, and document it.
 
@@ -351,13 +375,17 @@ def _search_for_cpp_api(
 def _search_for_python_api(
     doc_build_dir: Path,
     project_source_dir: Path,
-    package_path: typing.Optional[Path] = None,
+    package_path: t.Optional[Path] = None,
 ) -> str:
     """Search for a Python API and build it's documentation.
 
     Args:
-        doc_build_dir (str): Path where to create the temporary output.
-        project_source_dir (str): Path to the source file of the project.
+        doc_build_dir: Path where to create the temporary output.
+        project_source_dir: Path to the source file of the project.
+        package_path: Path to the Python package.  If not set, it is searched for below
+            project_source_dir.  This can also point to the install location of the
+            package, such that compiled modules (e.g. Python bindings for C++ functions)
+            are included as well.
 
     Returns:
         str: String added to the main index.rst in case there is a Python api.
@@ -459,7 +487,7 @@ def _copy_general_documentation(source_dir: Path, destination_dir: Path) -> None
 
 
 def _create_general_documentation_toctree(
-    doc_build_dir: Path, project_source_dir: Path, resource_dir: Path
+    doc_build_dir: Path, resource_dir: Path
 ) -> str:
     general_documentation = textwrap.dedent(
         """
@@ -479,10 +507,8 @@ def _create_general_documentation_toctree(
     return general_documentation
 
 
-def _copy_mainpage(
-    source_dir: Path, destination_dir: Path
-) -> typing.Tuple[str, FileFormat]:
-    """Searches for a doc_mainpage.rst or README in the source and copies it to the
+def _copy_mainpage(source_dir: Path, destination_dir: Path) -> t.Tuple[str, FileFormat]:
+    """Search for a doc_mainpage.rst or README in the source and copies it to the
     destination directory.
 
     Searches for
@@ -499,11 +525,11 @@ def _copy_mainpage(
     Returns:
         Tuple with filename in destination_dir and format of the file ("rst", "md",...).
 
-    Raises
+    Raises:
         FileNotFoundError: If no README is found in the source directory.
     """
     # map allowed readme file names to file format
-    options: typing.Dict[str, FileFormat] = {
+    options: t.Dict[str, FileFormat] = {
         "doc_mainpage.rst": "rst",
         "doc_mainpage.md": "md",
         "readme.rst": "rst",
@@ -514,7 +540,7 @@ def _copy_mainpage(
 
     root_files = [p for p in source_dir.iterdir() if p.is_file()]
 
-    def find_matching_file():
+    def find_matching_file() -> Path:
         for candidate in options:
             for file in root_files:
                 if file.name.lower() == candidate:
@@ -531,13 +557,13 @@ def _copy_mainpage(
 
 
 def _copy_license(source_dir: Path, destination_dir: Path) -> None:
-    """Searches for a license in the source and copies it to the destination directory.
+    """Search for a license in the source and copies it to the destination directory.
 
     Args:
         source_dir: Where to look for the README file.
         destination_dir: Directory to which the README is copied.
 
-    Raises
+    Raises:
         FileNotFoundError: If no README is found in the source directory.
     """
     license_file = [
@@ -616,11 +642,11 @@ def _search_for_license(project_source_dir: Path, doc_build_dir: Path) -> str:
 
 
 def _construct_intersphinx_mapping_config(
-    mapping_config: typing.Mapping[
+    mapping_config: t.Mapping[
         str,
-        typing.Union[
+        t.Union[
             str,
-            typing.Mapping[typing.Literal["target", "inventory"], typing.Optional[str]],
+            t.Mapping[t.Literal["target", "inventory"], t.Optional[str]],
         ],
     ]
 ) -> str:
@@ -671,12 +697,25 @@ def _construct_intersphinx_mapping_config(
 
 
 def build_documentation(
-    build_dir: PathLike,
-    project_source_dir: PathLike,
+    build_dir: StrPath,
+    project_source_dir: StrPath,
     project_version: str,
-    python_pkg_path: typing.Optional[PathLike] = None,
-    config_file: typing.Optional[PathLike] = None,
+    python_pkg_path: t.Optional[StrPath] = None,
+    config_file: t.Optional[StrPath] = None,
 ) -> None:
+    """Build the documentation.
+
+    Args:
+        build_dir:  Build directory in which the documentation is generated.
+        project_source_dir:  Path to the package source directory.
+        project_version:  Version of the package (will be shown in the documentation).
+        python_pkg_path: Path to the Python package.  If not set, it is searched for
+            below project_source_dir.  This can also point to the install location of
+            the package, such that compiled modules (e.g. Python bindings for C++
+            functions) are included as well.
+        config_file:  Path to the breathing-cat config file.  If not set, it is searched
+            for in project_source_dir.
+    """
     # make sure all paths are of type Path
     doc_build_dir = Path(build_dir)
     project_source_dir = Path(project_source_dir)
@@ -725,7 +764,7 @@ def build_documentation(
 
         if config["mainpage"]["auto_general_docs"]:
             general_documentation = _create_general_documentation_toctree(
-                doc_build_dir, project_source_dir, resource_dir
+                doc_build_dir, resource_dir
             )
     except FileNotFoundError:
         pass  # simply don't add general documentation if no doc files exist

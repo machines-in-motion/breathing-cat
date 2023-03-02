@@ -7,12 +7,12 @@ from breathing_cat.config import config_from_dict
 from breathing_cat import build
 
 
-@pytest.fixture
+@pytest.fixture()
 def ros_pkg_path() -> Path:
     return Path(__file__).parent / "test_packages" / "ros_pkg"
 
 
-@pytest.fixture
+@pytest.fixture()
 def test_configs():
     return Path(__file__).parent / "config"
 
@@ -70,6 +70,38 @@ def test_prepare_doxygen_exclude_patterns() -> None:
 /tmp/foo/foobar \
 /tmp/foo/third_party*"""
     )
+
+
+def test_find_doxygen() -> None:
+    path = build._find_doxygen()
+    assert path.endswith("doxygen")
+
+    with pytest.raises(build.ExecutableNotFoundError):
+        build._find_doxygen(path="")
+
+
+def test_find_breathe_apidoc() -> None:
+    path = build._find_breathe_apidoc()
+    assert path.endswith("breathe-apidoc")
+
+    with pytest.raises(build.ExecutableNotFoundError):
+        build._find_breathe_apidoc(path="")
+
+
+def test_find_sphinx_apidoc() -> None:
+    path = build._find_sphinx_apidoc()
+    assert path.endswith("sphinx-apidoc")
+
+    with pytest.raises(build.ExecutableNotFoundError):
+        build._find_sphinx_apidoc(path="")
+
+
+def test_find_sphinx_build() -> None:
+    path = build._find_sphinx_build()
+    assert path.endswith("sphinx-build")
+
+    with pytest.raises(build.ExecutableNotFoundError):
+        build._find_sphinx_build(path="")
 
 
 def test_build_doxygen_xml(ros_pkg_path: Path, tmp_path: Path) -> None:
@@ -139,13 +171,11 @@ def test_copy_general_documentation(ros_pkg_path: Path, tmp_path: Path) -> None:
     assert (build_dir / "doc/contribute.md").is_file()
 
 
-def test_create_general_documentation_toctree(
-    ros_pkg_path: Path, tmp_path: Path
-) -> None:
+def test_create_general_documentation_toctree(tmp_path: Path) -> None:
     build_dir = tmp_path
 
     resource_dir = build._resource_path()
-    build._create_general_documentation_toctree(build_dir, ros_pkg_path, resource_dir)
+    build._create_general_documentation_toctree(build_dir, resource_dir)
 
     general_doc_file = build_dir / "general_documentation.rst"
     assert general_doc_file.is_file()
@@ -264,16 +294,20 @@ def test_construct_intersphinx_mapping_config() -> None:
 
     # type checks
     with pytest.raises(AssertionError):
-        build._construct_intersphinx_mapping_config({42: "foo"})  # type: ignore
-    with pytest.raises(AssertionError):
-        build._construct_intersphinx_mapping_config({"foo": 42})  # type: ignore
-    with pytest.raises(AssertionError):
         build._construct_intersphinx_mapping_config(
-            {"foo": {"target": 13, "inventory": "inv"}}  # type: ignore
+            {42: "foo"}  # type: ignore[dict-item]
         )
     with pytest.raises(AssertionError):
         build._construct_intersphinx_mapping_config(
-            {"foo": {"target": "url", "inventory": 42}}  # type: ignore
+            {"foo": 42}  # type: ignore[dict-item]
+        )
+    with pytest.raises(AssertionError):
+        build._construct_intersphinx_mapping_config(
+            {"foo": {"target": 13, "inventory": "inv"}}  # type: ignore[dict-item]
+        )
+    with pytest.raises(AssertionError):
+        build._construct_intersphinx_mapping_config(
+            {"foo": {"target": "url", "inventory": 42}}  # type: ignore[dict-item]
         )
 
 
@@ -285,7 +319,7 @@ def test_build_documentation_default(tmp_path, ros_pkg_path):
     assert index_html_file.exists()
     index_html_content = index_html_file.read_text()
     # verify the mainpage title
-    assert "Welcome to ros_pkg’s documentation!" in index_html_content
+    assert "Welcome to ros_pkg’s documentation!" in index_html_content  # noqa[RUF001]
     # verify General Documentation is there
     assert "General Documentation" in index_html_content
 
@@ -308,7 +342,9 @@ def test_build_documentation_mainpage_config(tmp_path, ros_pkg_path, test_config
     assert index_html_file.exists()
     index_html_content = index_html_file.read_text()
     # verify the mainpage title
-    assert "Welcome to ros_pkg’s documentation!" not in index_html_content
+    assert (
+        "Welcome to ros_pkg’s documentation!" not in index_html_content  # noqa[RUF001]
+    )
     assert "Custom Title" in index_html_content
     # verify General Documentation is not there
     assert "General Documentation" not in index_html_content

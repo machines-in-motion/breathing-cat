@@ -2,16 +2,31 @@ import argparse
 import logging
 import pathlib
 import sys
+import textwrap
 
 from . import __version__, find_version
 from .build import build_documentation
 
 
 def main() -> int:
-    def AbsolutePath(path):
+    """Use breathing-cat to build documentation of a C++/Python package."""
+
+    def absolute_path(path: str) -> pathlib.Path:
         return pathlib.Path(path).absolute()
 
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description=textwrap.dedent(
+            """
+            Use breathing-cat to build documentation of a C++/Python package.
+
+            Copyright (c) 2022 New York University and Max Planck Gesellschaft.
+            License: BSD 3-clause
+
+            For more information see https://github.com/machines-in-motion/breathing-cat
+            """
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     parser.add_argument(
         "--version",
         action="version",
@@ -22,7 +37,7 @@ def main() -> int:
         "--output-dir",
         "-o",
         required=True,
-        type=AbsolutePath,
+        type=absolute_path,
         metavar="DIRECTORY",
         help="Build directory",
     )
@@ -30,13 +45,13 @@ def main() -> int:
         "--package-dir",
         "-p",
         required=True,
-        type=AbsolutePath,
+        type=absolute_path,
         metavar="DIRECTORY",
         help="Package directory",
     )
     parser.add_argument(
         "--python-dir",
-        type=AbsolutePath,
+        type=absolute_path,
         metavar="DIRECTORY",
         help="""Directory containing the Python package.  If not set, it is
             auto-detected inside the package directory
@@ -58,7 +73,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--config",
-        type=AbsolutePath,
+        type=absolute_path,
         metavar="FILE",
         help="""Path to config file.  If not set explicitly, bcat searches for a file
             'breathing_cat.toml' in the package directory.
@@ -87,7 +102,7 @@ def main() -> int:
     if not args.package_version:
         try:
             args.package_version = find_version.find_version(args.package_dir)
-        except find_version.VersionNotFound:
+        except find_version.VersionNotFoundError:
             print(
                 "ERROR: Package version could not be determined."
                 "  Please specify it using --package-version."
