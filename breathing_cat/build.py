@@ -19,6 +19,10 @@ StrPath = t.Union[str, os.PathLike[str]]
 FileFormat = t.Literal["md", "rst", "txt"]
 
 
+class ExecutableNotFoundError(RuntimeError):
+    """Error indicating that an executable has not been found."""
+
+
 def _get_cpp_file_patterns() -> t.List[str]:
     return ["*.h", "*.hh", "*.hpp", "*.hxx", "*.cpp", "*.c", "*.cc"]
 
@@ -35,8 +39,8 @@ def _find_doxygen() -> str:
     exec_path = shutil.which("doxygen")
     if exec_path is not None:
         return exec_path
-    raise Exception(
-        "doxygen executable not found. You may try " "'(sudo ) apt install doxygen*'"
+    raise ExecutableNotFoundError(
+        "doxygen executable not found. You may try '(sudo ) apt install doxygen*'"
     )
 
 
@@ -52,7 +56,7 @@ def _find_breathe_apidoc() -> str:
     exec_path = shutil.which("breathe-apidoc")
     if exec_path is not None:
         return exec_path
-    raise Exception(
+    raise ExecutableNotFoundError(
         "breathe-apidoc executable not found. You may try "
         "'(sudo -H) pip3 install breathe'"
     )
@@ -70,7 +74,7 @@ def _find_sphinx_apidoc() -> str:
     exec_path = shutil.which("sphinx-apidoc")
     if exec_path is not None:
         return exec_path
-    raise Exception(
+    raise ExecutableNotFoundError(
         "sphinx-apidoc executable not found. You may try "
         "'(sudo -H) pip3 install sphinx'"
     )
@@ -89,7 +93,7 @@ def _find_sphinx_build() -> str:
     if exec_path is not None:
         return exec_path
 
-    raise Exception(
+    raise ExecutableNotFoundError(
         "sphinx-build executable not found. You may try "
         "'(sudo -H) pip3 install sphinx'"
     )
