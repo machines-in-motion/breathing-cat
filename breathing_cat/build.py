@@ -256,8 +256,8 @@ def _build_sphinx_api_doc(doc_build_dir: Path, python_source_dir: Path) -> None:
     generate '.rst' files.
 
     Args:
-        doc_build_dir (str): Path where to create the temporary output.
-        project_source_dir (str): Path to the source file of the project.
+        doc_build_dir: Path where to create the temporary output.
+        python_source_dir: Path to the Python source files of the project.
     """
     # define input folder
     if python_source_dir.is_dir():
@@ -378,8 +378,12 @@ def _search_for_python_api(
     """Search for a Python API and build it's documentation.
 
     Args:
-        doc_build_dir (str): Path where to create the temporary output.
-        project_source_dir (str): Path to the source file of the project.
+        doc_build_dir: Path where to create the temporary output.
+        project_source_dir: Path to the source file of the project.
+        package_path: Path to the Python package.  If not set, it is searched for below
+            project_source_dir.  This can also point to the install location of the
+            package, such that compiled modules (e.g. Python bindings for C++ functions)
+            are included as well.
 
     Returns:
         str: String added to the main index.rst in case there is a Python api.
@@ -502,7 +506,7 @@ def _create_general_documentation_toctree(
 
 
 def _copy_mainpage(source_dir: Path, destination_dir: Path) -> t.Tuple[str, FileFormat]:
-    """Searches for a doc_mainpage.rst or README in the source and copies it to the
+    """Search for a doc_mainpage.rst or README in the source and copies it to the
     destination directory.
 
     Searches for
@@ -519,7 +523,7 @@ def _copy_mainpage(source_dir: Path, destination_dir: Path) -> t.Tuple[str, File
     Returns:
         Tuple with filename in destination_dir and format of the file ("rst", "md",...).
 
-    Raises
+    Raises:
         FileNotFoundError: If no README is found in the source directory.
     """
     # map allowed readme file names to file format
@@ -551,13 +555,13 @@ def _copy_mainpage(source_dir: Path, destination_dir: Path) -> t.Tuple[str, File
 
 
 def _copy_license(source_dir: Path, destination_dir: Path) -> None:
-    """Searches for a license in the source and copies it to the destination directory.
+    """Search for a license in the source and copies it to the destination directory.
 
     Args:
         source_dir: Where to look for the README file.
         destination_dir: Directory to which the README is copied.
 
-    Raises
+    Raises:
         FileNotFoundError: If no README is found in the source directory.
     """
     license_file = [
@@ -697,6 +701,19 @@ def build_documentation(
     python_pkg_path: t.Optional[StrPath] = None,
     config_file: t.Optional[StrPath] = None,
 ) -> None:
+    """Build the documentation.
+
+    Args:
+        build_dir:  Build directory in which the documentation is generated.
+        project_source_dir:  Path to the package source directory.
+        project_version:  Version of the package (will be shown in the documentation).
+        python_pkg_path: Path to the Python package.  If not set, it is searched for
+            below project_source_dir.  This can also point to the install location of
+            the package, such that compiled modules (e.g. Python bindings for C++
+            functions) are included as well.
+        config_file:  Path to the breathing-cat config file.  If not set, it is searched
+            for in project_source_dir.
+    """
     # make sure all paths are of type Path
     doc_build_dir = Path(build_dir)
     project_source_dir = Path(project_source_dir)
