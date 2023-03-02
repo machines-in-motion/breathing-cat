@@ -3,6 +3,8 @@
 License BSD-3-Clause
 Copyright (c) 2021, New York University and Max Planck Gesellschaft.
 """
+from __future__ import annotations
+
 import collections.abc
 import fnmatch
 import os
@@ -14,9 +16,9 @@ from pathlib import Path
 
 from . import config as _config
 
-
-StrPath = t.Union[str, os.PathLike[str]]
-FileFormat = t.Literal["md", "rst", "txt"]
+if t.TYPE_CHECKING:
+    StrPath = t.Union[str, os.PathLike[str]]
+    FileFormat = t.Literal["md", "rst", "txt"]
 
 
 class ExecutableNotFoundError(RuntimeError):
