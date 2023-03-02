@@ -1,3 +1,4 @@
+import os
 import typing
 from pathlib import Path
 
@@ -70,6 +71,38 @@ def test_prepare_doxygen_exclude_patterns() -> None:
 /tmp/foo/foobar \
 /tmp/foo/third_party*"""
     )
+
+
+def test_find_doxygen() -> None:
+    path = build._find_doxygen()
+    assert path.endswith("doxygen")
+
+    with pytest.raises(build.ExecutableNotFoundError):
+        build._find_doxygen(path="")
+
+
+def test_find_breathe_apidoc() -> None:
+    path = build._find_breathe_apidoc()
+    assert path.endswith("breathe-apidoc")
+
+    with pytest.raises(build.ExecutableNotFoundError):
+        build._find_breathe_apidoc(path="")
+
+
+def test_find_sphinx_apidoc() -> None:
+    path = build._find_sphinx_apidoc()
+    assert path.endswith("sphinx-apidoc")
+
+    with pytest.raises(build.ExecutableNotFoundError):
+        build._find_sphinx_apidoc(path="")
+
+
+def test_find_sphinx_build() -> None:
+    path = build._find_sphinx_build()
+    assert path.endswith("sphinx-build")
+
+    with pytest.raises(build.ExecutableNotFoundError):
+        build._find_sphinx_build(path="")
 
 
 def test_build_doxygen_xml(ros_pkg_path: Path, tmp_path: Path) -> None:
