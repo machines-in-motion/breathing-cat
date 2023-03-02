@@ -9,17 +9,17 @@ import os
 import shutil
 import subprocess
 import textwrap
-import typing
+import typing as t
 from pathlib import Path
 
 from . import config as _config
 
 
-PathLike = typing.Union[str, os.PathLike]
-FileFormat = typing.Literal["md", "rst", "txt"]
+StrPath = t.Union[str, os.PathLike[str]]
+FileFormat = t.Literal["md", "rst", "txt"]
 
 
-def _get_cpp_file_patterns() -> typing.List[str]:
+def _get_cpp_file_patterns() -> t.List[str]:
     return ["*.h", "*.hh", "*.hpp", "*.hxx", "*.cpp", "*.c", "*.cc"]
 
 
@@ -115,7 +115,7 @@ def _resource_path() -> Path:
 
 
 def _prepare_doxygen_exclude_patterns(
-    project_source_dir: Path, doxygen_config: typing.Mapping
+    project_source_dir: Path, doxygen_config: t.Mapping
 ) -> str:
     """Convert the doxygen exclude patterns config into a string for Doxyfile.
 
@@ -140,7 +140,7 @@ def _prepare_doxygen_exclude_patterns(
 
 
 def _build_doxygen_xml(
-    doc_build_dir: Path, project_source_dir: Path, doxygen_config: typing.Mapping
+    doc_build_dir: Path, project_source_dir: Path, doxygen_config: t.Mapping
 ) -> None:
     """
     Use doxygen to parse the C++ source files and generate a corresponding xml
@@ -280,9 +280,7 @@ def _build_sphinx_build(doc_build_dir: Path) -> None:
         doc_build_dir (str): Path where to create the temporary output.
     """
     sphinx_build = _find_sphinx_build()
-    command = (
-        sphinx_build + " -M html " + str(doc_build_dir) + " " + str(doc_build_dir)
-    )
+    command = sphinx_build + " -M html " + str(doc_build_dir) + " " + str(doc_build_dir)
     process = subprocess.Popen(
         command.split(), stdout=subprocess.PIPE, cwd=str(doc_build_dir)
     )
@@ -297,7 +295,7 @@ def _search_for_cpp_api(
     doc_build_dir: Path,
     project_source_dir: Path,
     resource_dir: Path,
-    config: typing.Mapping,
+    config: t.Mapping,
 ) -> str:
     """Search if there is a C++ api do document, and document it.
 
@@ -359,7 +357,7 @@ def _search_for_cpp_api(
 def _search_for_python_api(
     doc_build_dir: Path,
     project_source_dir: Path,
-    package_path: typing.Optional[Path] = None,
+    package_path: t.Optional[Path] = None,
 ) -> str:
     """Search for a Python API and build it's documentation.
 
@@ -487,9 +485,7 @@ def _create_general_documentation_toctree(
     return general_documentation
 
 
-def _copy_mainpage(
-    source_dir: Path, destination_dir: Path
-) -> typing.Tuple[str, FileFormat]:
+def _copy_mainpage(source_dir: Path, destination_dir: Path) -> t.Tuple[str, FileFormat]:
     """Searches for a doc_mainpage.rst or README in the source and copies it to the
     destination directory.
 
@@ -511,7 +507,7 @@ def _copy_mainpage(
         FileNotFoundError: If no README is found in the source directory.
     """
     # map allowed readme file names to file format
-    options: typing.Dict[str, FileFormat] = {
+    options: t.Dict[str, FileFormat] = {
         "doc_mainpage.rst": "rst",
         "doc_mainpage.md": "md",
         "readme.rst": "rst",
@@ -624,11 +620,11 @@ def _search_for_license(project_source_dir: Path, doc_build_dir: Path) -> str:
 
 
 def _construct_intersphinx_mapping_config(
-    mapping_config: typing.Mapping[
+    mapping_config: t.Mapping[
         str,
-        typing.Union[
+        t.Union[
             str,
-            typing.Mapping[typing.Literal["target", "inventory"], typing.Optional[str]],
+            t.Mapping[t.Literal["target", "inventory"], t.Optional[str]],
         ],
     ]
 ) -> str:
@@ -679,11 +675,11 @@ def _construct_intersphinx_mapping_config(
 
 
 def build_documentation(
-    build_dir: PathLike,
-    project_source_dir: PathLike,
+    build_dir: StrPath,
+    project_source_dir: StrPath,
     project_version: str,
-    python_pkg_path: typing.Optional[PathLike] = None,
-    config_file: typing.Optional[PathLike] = None,
+    python_pkg_path: t.Optional[StrPath] = None,
+    config_file: t.Optional[StrPath] = None,
 ) -> None:
     # make sure all paths are of type Path
     doc_build_dir = Path(build_dir)
