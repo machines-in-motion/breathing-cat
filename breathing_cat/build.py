@@ -27,8 +27,11 @@ def _get_cpp_file_patterns() -> t.List[str]:
     return ["*.h", "*.hh", "*.hpp", "*.hxx", "*.cpp", "*.c", "*.cc"]
 
 
-def _find_doxygen() -> str:
+def _find_doxygen(path: t.Optional[StrPath] = None) -> str:
     """Find the full path to the doxygen executable.
+
+    Args:
+        path: Optional search path.  If not set the $PATH environment variable is used.
 
     Raises:
         Exception: if the doxygen executable is not found.
@@ -36,7 +39,7 @@ def _find_doxygen() -> str:
     Returns:
         The full path to the doxygen executable.
     """
-    exec_path = shutil.which("doxygen")
+    exec_path = shutil.which("doxygen", path=path)
     if exec_path is not None:
         return exec_path
     raise ExecutableNotFoundError(
@@ -44,8 +47,11 @@ def _find_doxygen() -> str:
     )
 
 
-def _find_breathe_apidoc() -> str:
+def _find_breathe_apidoc(path: t.Optional[StrPath] = None) -> str:
     """Find the full path to the breathe-apidoc executable.
+
+    Args:
+        path: Optional search path.  If not set the $PATH environment variable is used.
 
     Raises:
         Exception: if the breathe-apidoc executable is not found.
@@ -53,7 +59,7 @@ def _find_breathe_apidoc() -> str:
     Returns:
         The full path to the black executable.
     """
-    exec_path = shutil.which("breathe-apidoc")
+    exec_path = shutil.which("breathe-apidoc", path=path)
     if exec_path is not None:
         return exec_path
     raise ExecutableNotFoundError(
@@ -62,8 +68,11 @@ def _find_breathe_apidoc() -> str:
     )
 
 
-def _find_sphinx_apidoc() -> str:
+def _find_sphinx_apidoc(path: t.Optional[StrPath] = None) -> str:
     """Find the full path to the sphinx-apidoc executable.
+
+    Args:
+        path: Optional search path.  If not set the $PATH environment variable is used.
 
     Raises:
         Exception: if the sphinx-apidoc executable is not found.
@@ -71,7 +80,7 @@ def _find_sphinx_apidoc() -> str:
     Returns:
         The full path to the black executable.
     """
-    exec_path = shutil.which("sphinx-apidoc")
+    exec_path = shutil.which("sphinx-apidoc", path=path)
     if exec_path is not None:
         return exec_path
     raise ExecutableNotFoundError(
@@ -80,8 +89,11 @@ def _find_sphinx_apidoc() -> str:
     )
 
 
-def _find_sphinx_build() -> str:
+def _find_sphinx_build(path: t.Optional[StrPath] = None) -> str:
     """Find the full path to the sphinx-build executable.
+
+    Args:
+        path: Optional search path.  If not set the $PATH environment variable is used.
 
     Raises:
         Exception: if the sphinx-build executable is not found.
@@ -89,7 +101,7 @@ def _find_sphinx_build() -> str:
     Returns:
         The full path to the black executable.
     """
-    exec_path = shutil.which("sphinx-build")
+    exec_path = shutil.which("sphinx-build", path=path)
     if exec_path is not None:
         return exec_path
 
