@@ -172,13 +172,11 @@ def test_copy_general_documentation(ros_pkg_path: Path, tmp_path: Path) -> None:
     assert (build_dir / "doc/contribute.md").is_file()
 
 
-def test_create_general_documentation_toctree(
-    ros_pkg_path: Path, tmp_path: Path
-) -> None:
+def test_create_general_documentation_toctree(tmp_path: Path) -> None:
     build_dir = tmp_path
 
     resource_dir = build._resource_path()
-    build._create_general_documentation_toctree(build_dir, ros_pkg_path, resource_dir)
+    build._create_general_documentation_toctree(build_dir, resource_dir)
 
     general_doc_file = build_dir / "general_documentation.rst"
     assert general_doc_file.is_file()

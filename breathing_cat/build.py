@@ -485,7 +485,7 @@ def _copy_general_documentation(source_dir: Path, destination_dir: Path) -> None
 
 
 def _create_general_documentation_toctree(
-    doc_build_dir: Path, project_source_dir: Path, resource_dir: Path
+    doc_build_dir: Path, resource_dir: Path
 ) -> str:
     general_documentation = textwrap.dedent(
         """
@@ -538,7 +538,7 @@ def _copy_mainpage(source_dir: Path, destination_dir: Path) -> t.Tuple[str, File
 
     root_files = [p for p in source_dir.iterdir() if p.is_file()]
 
-    def find_matching_file():
+    def find_matching_file() -> Path:
         for candidate in options:
             for file in root_files:
                 if file.name.lower() == candidate:
@@ -762,7 +762,7 @@ def build_documentation(
 
         if config["mainpage"]["auto_general_docs"]:
             general_documentation = _create_general_documentation_toctree(
-                doc_build_dir, project_source_dir, resource_dir
+                doc_build_dir, resource_dir
             )
     except FileNotFoundError:
         pass  # simply don't add general documentation if no doc files exist
