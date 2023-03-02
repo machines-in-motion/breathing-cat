@@ -328,6 +328,10 @@ def test_build_documentation_default(tmp_path, ros_pkg_path):
     index_rst_content = index_rst_file.read_text()
     assert "@" not in index_rst_content
 
+    # verify that the PKG symlink was created
+    assert (tmp_path / "PKG").is_symlink()
+    assert (tmp_path / "PKG" / "package.xml").exists()
+
 
 def test_build_documentation_mainpage_config(tmp_path, ros_pkg_path, test_configs):
     # just a very basic test if index.html is created
