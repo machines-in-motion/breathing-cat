@@ -189,11 +189,13 @@ def _build_doxygen_xml(
     with open(doxyfile_out, "wt") as f:
         f.write(doxyfile_out_text)
 
-    bashCommand = doxygen + " " + str(doxyfile_out)
+    command = doxygen + " " + str(doxyfile_out)
     process = subprocess.Popen(
-        bashCommand.split(), stdout=subprocess.PIPE, cwd=str(doxygen_output)
+        command.split(), stdout=subprocess.PIPE, cwd=str(doxygen_output)
     )
     output, error = process.communicate()
+    print("\n------------------------------------------------------------------")
+    print("$ {}\n\n".format(command))
     print("Doxygen output:\n", output.decode("UTF-8"))
     print("Doxygen error:\n", error)
     print("")
@@ -212,7 +214,7 @@ def _build_breath_api_doc(doc_build_dir: Path) -> None:
     breathe_output = doc_build_dir / "breathe_apidoc"
     breathe_option = "-f -g class,interface,struct,union,file,namespace,group"
 
-    bashCommand = (
+    command = (
         breathe_apidoc
         + " -o "
         + str(breathe_output)
@@ -222,9 +224,11 @@ def _build_breath_api_doc(doc_build_dir: Path) -> None:
         + str(breathe_option)
     )
     process = subprocess.Popen(
-        bashCommand.split(), stdout=subprocess.PIPE, cwd=str(doc_build_dir)
+        command.split(), stdout=subprocess.PIPE, cwd=str(doc_build_dir)
     )
     output, error = process.communicate()
+    print("\n------------------------------------------------------------------")
+    print("$ {}\n\n".format(command))
     print("breathe-apidoc output:\n", output.decode("UTF-8"))
     print("breathe-apidoc error:\n", error)
     print("")
@@ -245,7 +249,7 @@ def _build_sphinx_api_doc(doc_build_dir: Path, python_source_dir: Path) -> None:
         sphinx_apidoc_input = str(python_source_dir)
         sphinx_apidoc_output = str(doc_build_dir)
 
-        bashCommand = (
+        command = (
             sphinx_apidoc
             + " --separate "
             + " -o "
@@ -254,9 +258,11 @@ def _build_sphinx_api_doc(doc_build_dir: Path, python_source_dir: Path) -> None:
             + sphinx_apidoc_input
         )
         process = subprocess.Popen(
-            bashCommand.split(), stdout=subprocess.PIPE, cwd=str(doc_build_dir)
+            command.split(), stdout=subprocess.PIPE, cwd=str(doc_build_dir)
         )
         output, error = process.communicate()
+        print("\n------------------------------------------------------------------")
+        print("$ {}\n\n".format(command))
         print("sphinx-apidoc output:\n", output.decode("UTF-8"))
         print("sphinx-apidoc error:\n", error)
 
@@ -274,15 +280,17 @@ def _build_sphinx_build(doc_build_dir: Path) -> None:
         doc_build_dir (str): Path where to create the temporary output.
     """
     sphinx_build = _find_sphinx_build()
-    bashCommand = (
+    command = (
         sphinx_build + " -M html " + str(doc_build_dir) + " " + str(doc_build_dir)
     )
     process = subprocess.Popen(
-        bashCommand.split(), stdout=subprocess.PIPE, cwd=str(doc_build_dir)
+        command.split(), stdout=subprocess.PIPE, cwd=str(doc_build_dir)
     )
     output, error = process.communicate()
-    print("sphinx-apidoc output:\n", output.decode("UTF-8"))
-    print("sphinx-apidoc error:\n", error)
+    print("\n------------------------------------------------------------------")
+    print("$ {}\n\n".format(command))
+    print("sphinx-build output:\n", output.decode("UTF-8"))
+    print("sphinx-build error:\n", error)
 
 
 def _search_for_cpp_api(
