@@ -1,16 +1,20 @@
 """Functions for auto-detecting the version of the package."""
+from __future__ import annotations
+
 import logging
-import pathlib
 import re
 import typing
 import xml.etree.ElementTree
+
+if typing.TYPE_CHECKING:
+    import pathlib
 
 
 _logger = logging.getLogger("breathing_cat.find_version")
 
 
-class VersionNotFound(Exception):
-    pass
+class VersionNotFoundError(Exception):
+    """Indicates that it was not possible to determine the package's version."""
 
 
 def _check_package_xml(package_dir: pathlib.Path) -> typing.Optional[str]:
@@ -71,4 +75,4 @@ def find_version(package_dir: pathlib.Path) -> str:
             print(f"Found package version: {version}")
             return version
 
-    raise VersionNotFound()
+    raise VersionNotFoundError

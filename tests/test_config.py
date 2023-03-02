@@ -6,7 +6,7 @@ import pytest
 from breathing_cat import config
 
 
-@pytest.fixture
+@pytest.fixture()
 def test_data():
     return pathlib.Path(__file__).parent / "config"
 
@@ -23,7 +23,7 @@ def test_load_config(test_data):
     assert cfg["doxygen"]["exclude_patterns"][0] == "config1"
 
 
-def test_config_from_dict_intersphinx(test_data):
+def test_config_from_dict_intersphinx():
     """Test loading a config file with load_config()."""
     cfg = config.config_from_dict(
         {
@@ -59,7 +59,7 @@ def test_find_and_load_config_intersphinx(test_data):
     }
 
 
-def test_config_from_dict_mainpage(test_data):
+def test_config_from_dict_mainpage():
     """Test loading a config file with load_config()."""
     cfg1 = config.config_from_dict({})
     assert cfg1["mainpage"] == {

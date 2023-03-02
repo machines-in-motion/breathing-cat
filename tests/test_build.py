@@ -1,4 +1,3 @@
-import os
 import typing
 from pathlib import Path
 
@@ -8,12 +7,12 @@ from breathing_cat.config import config_from_dict
 from breathing_cat import build
 
 
-@pytest.fixture
+@pytest.fixture()
 def ros_pkg_path() -> Path:
     return Path(__file__).parent / "test_packages" / "ros_pkg"
 
 
-@pytest.fixture
+@pytest.fixture()
 def test_configs():
     return Path(__file__).parent / "config"
 
@@ -295,16 +294,20 @@ def test_construct_intersphinx_mapping_config() -> None:
 
     # type checks
     with pytest.raises(AssertionError):
-        build._construct_intersphinx_mapping_config({42: "foo"})  # type: ignore
-    with pytest.raises(AssertionError):
-        build._construct_intersphinx_mapping_config({"foo": 42})  # type: ignore
-    with pytest.raises(AssertionError):
         build._construct_intersphinx_mapping_config(
-            {"foo": {"target": 13, "inventory": "inv"}}  # type: ignore
+            {42: "foo"}  # type: ignore[dict-item]
         )
     with pytest.raises(AssertionError):
         build._construct_intersphinx_mapping_config(
-            {"foo": {"target": "url", "inventory": 42}}  # type: ignore
+            {"foo": 42}  # type: ignore[dict-item]
+        )
+    with pytest.raises(AssertionError):
+        build._construct_intersphinx_mapping_config(
+            {"foo": {"target": 13, "inventory": "inv"}}  # type: ignore[dict-item]
+        )
+    with pytest.raises(AssertionError):
+        build._construct_intersphinx_mapping_config(
+            {"foo": {"target": "url", "inventory": 42}}  # type: ignore[dict-item]
         )
 
 
@@ -316,7 +319,7 @@ def test_build_documentation_default(tmp_path, ros_pkg_path):
     assert index_html_file.exists()
     index_html_content = index_html_file.read_text()
     # verify the mainpage title
-    assert "Welcome to ros_pkg’s documentation!" in index_html_content
+    assert "Welcome to ros_pkg’s documentation!" in index_html_content  # noqa[RUF001]
     # verify General Documentation is there
     assert "General Documentation" in index_html_content
 
@@ -339,7 +342,9 @@ def test_build_documentation_mainpage_config(tmp_path, ros_pkg_path, test_config
     assert index_html_file.exists()
     index_html_content = index_html_file.read_text()
     # verify the mainpage title
-    assert "Welcome to ros_pkg’s documentation!" not in index_html_content
+    assert (
+        "Welcome to ros_pkg’s documentation!" not in index_html_content  # noqa[RUF001]
+    )
     assert "Custom Title" in index_html_content
     # verify General Documentation is not there
     assert "General Documentation" not in index_html_content
