@@ -267,20 +267,20 @@ def _build_sphinx_api_doc(doc_build_dir: Path, python_source_dir: Path) -> None:
         sphinx_apidoc_input = str(python_source_dir)
         sphinx_apidoc_output = str(doc_build_dir)
 
-        command = (
-            sphinx_apidoc
-            + " --separate "
-            + " -o "
-            + sphinx_apidoc_output
-            + " "
-            + sphinx_apidoc_input
-        )
+        command = [
+            sphinx_apidoc,
+            "--separate",
+            "-o",
+            sphinx_apidoc_output,
+            sphinx_apidoc_input,
+        ]
+
         process = subprocess.Popen(
-            command.split(), stdout=subprocess.PIPE, cwd=str(doc_build_dir)
+            command, stdout=subprocess.PIPE, cwd=str(doc_build_dir)
         )
         output, error = process.communicate()
         print("\n------------------------------------------------------------------")
-        print("$ {}\n\n".format(command))
+        print("$ {}\n\n".format(" ".join(command)))
         print("sphinx-apidoc output:\n", output.decode("UTF-8"))
         print("sphinx-apidoc error:\n", error)
 
