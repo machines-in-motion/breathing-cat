@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Config parameter `html.logo` to specify an image that is shown in the top of
   the navigation bar.
+- Create a symlink called `PKG` in the build directory that points to the project source
+  directory.  This allows, for example, to include example scripts from the source
+  directory into RST files, using a path like `/PKG/scripts/example.py`.
 
 ### Changed
 - Private members of C++ classes are not shown anymore.  This affects the

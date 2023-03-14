@@ -112,6 +112,28 @@ auto_general_docs = true
 ```
 
 
+Include Files From Source Directory in the Documentation
+--------------------------------------------------------
+
+You may want to include files from the package into the documentation text.  For example
+the package may contain a file `scripts/example.py` which could normally be included in
+a file `doc/examples.rst` like this:
+
+```rst
+.. literalinclude:: ../scripts/example.py
+```
+
+With breathing cat, this unfortunately doesn't work, as all the documentation files are
+copied to a separate build directory and processed there.  From within this build
+directory, the relative path given above cannot be resolved.  However, a symlink called
+"PKG" is created in the build directory and points to the package source directory.  So
+instead of the above, you can use the following (note the leading `/`):
+
+```rst
+.. literalinclude:: /PKG/scripts/example.py
+```
+
+
 Assumptions Regarding Package Structure
 ---------------------------------------
 

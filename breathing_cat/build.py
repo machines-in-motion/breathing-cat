@@ -769,6 +769,10 @@ def build_documentation(
     except FileNotFoundError:
         pass  # simply don't add general documentation if no doc files exist
 
+    # Link project_source_dir as PKG in build directory.  This allows, for example, to
+    # include source files from the package using a path like `/PKG/scripts/foo.py`.
+    os.symlink(project_source_dir, doc_build_dir / "PKG", target_is_directory=True)
+
     #
     # Copy the license and readme file.
     #
