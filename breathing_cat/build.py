@@ -269,6 +269,7 @@ def _build_sphinx_api_doc(doc_build_dir: Path, python_source_dir: Path) -> None:
 
         command = [
             sphinx_apidoc,
+            "--module-first",
             "--separate",
             "-o",
             sphinx_apidoc_output,
