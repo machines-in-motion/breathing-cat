@@ -41,14 +41,15 @@ def _check_cmakelists(package_dir: pathlib.Path) -> typing.Optional[str]:
     if file.exists():
         _logger.debug("%s exists", file)
 
-        pattern = re.compile(r"\bproject\(.* VERSION (\S+)\b.*\)", re.IGNORECASE)
+        pattern1 = re.compile(r"\bproject\(.* VERSION (\S+)\b.*\)", re.IGNORECASE)
+        pattern2 = re.compile(r"\bPROJECT\_VERSION (\S+)\b.*\)", re.IGNORECASE)
         with open(file) as f:
             for line in f:
-                m = re.search(pattern, line)
-                if m:
-                    version = m.group(1)
-                    _logger.info("Found package version %s", version)
-                    return version
+                for m in [re.search(pattern1, line), re.search(pattern2, line)]:
+                    if m:
+                        version = m.group(1)
+                        _logger.info("Found package version %s", version)
+                        return version
 
     return None
 
