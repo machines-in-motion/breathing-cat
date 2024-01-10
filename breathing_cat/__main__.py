@@ -1,3 +1,4 @@
+"""Script to run breathing cat."""
 import argparse
 import logging
 import pathlib
@@ -66,6 +67,19 @@ def main() -> int:
         """,
     )
     parser.add_argument(
+        "--skip-cpp", action="store_true", help="Do not include C++ API documentation."
+    )
+    parser.add_argument(
+        "--skip-python",
+        action="store_true",
+        help="Do not include Python API documentation.",
+    )
+    parser.add_argument(
+        "--skip-cmake",
+        action="store_true",
+        help="Do not include CMake API documentation.",
+    )
+    parser.add_argument(
         "--force",
         "-f",
         action="store_true",
@@ -115,6 +129,9 @@ def main() -> int:
         args.package_version,
         python_pkg_path=args.python_dir,
         config_file=args.config,
+        skip_cpp=args.skip_cpp,
+        skip_python=args.skip_python,
+        skip_cmake=args.skip_cmake,
     )
 
     return 0

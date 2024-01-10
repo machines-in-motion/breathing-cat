@@ -649,7 +649,7 @@ def _construct_intersphinx_mapping_config(
             str,
             t.Mapping[t.Literal["target", "inventory"], t.Optional[str]],
         ],
-    ]
+    ],
 ) -> str:
     """Construct argument for intersphinx_mapping parameter.
 
@@ -703,6 +703,9 @@ def build_documentation(
     project_version: str,
     python_pkg_path: t.Optional[StrPath] = None,
     config_file: t.Optional[StrPath] = None,
+    skip_cpp: bool = False,
+    skip_python: bool = False,
+    skip_cmake: bool = False,
 ) -> None:
     """Build the documentation.
 
@@ -716,6 +719,9 @@ def build_documentation(
             functions) are included as well.
         config_file:  Path to the breathing-cat config file.  If not set, it is searched
             for in project_source_dir.
+        skip_cpp:  Do not auto-generate C++ API documentation.
+        skip_python:  Do not auto-generate Python API documentation.
+        skip_cmake:  Do not auto-generate CMake API documentation.
     """
     # make sure all paths are of type Path
     doc_build_dir = Path(build_dir)
@@ -749,15 +755,23 @@ def build_documentation(
 
     # String to replace in the main index.rst
 
-    cpp_api = _search_for_cpp_api(
-        doc_build_dir, project_source_dir, resource_dir, config
+    cpp_api = (
+        _search_for_cpp_api(doc_build_dir, project_source_dir, resource_dir, config)
+        if not skip_cpp
+        else ""
     )
 
-    python_api = _search_for_python_api(
-        doc_build_dir, project_source_dir, python_pkg_path
+    python_api = (
+        _search_for_python_api(doc_build_dir, project_source_dir, python_pkg_path)
+        if not skip_python
+        else ""
     )
 
-    cmake_api = _search_for_cmake_api(doc_build_dir, project_source_dir, resource_dir)
+    cmake_api = (
+        _search_for_cmake_api(doc_build_dir, project_source_dir, resource_dir)
+        if not skip_cmake
+        else ""
+    )
 
     general_documentation = ""
     try:
