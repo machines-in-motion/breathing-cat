@@ -5,7 +5,11 @@
 
 import datetime
 import os
+import re
 import sys
+
+import docutils.nodes
+import sphinx
 
 # -- Path setup --------------------------------------------------------------
 
@@ -146,3 +150,73 @@ intersphinx_mapping = @INTERSPHINX_MAPPING@
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+
+object_description_options = [
+    ("std:confval", dict(toc_icon_class="data", toc_icon_text="C")),
+]
+
+
+def setup(app):
+    def confval_parse_format(env, sig, node):
+        # Parse confval values for add_object_type().  Possible signatures are:
+        # - foo
+        # - foo: type
+        # - foo = default_value
+        # - foo: type = default_value
+
+        # From Sphinx docs:
+        # If you provide parse_node, it must be a function that takes a string and a
+        # docutils node, and it must populate the node with children parsed from the
+        # string. It must then return the name of the item to be used in
+        # crossreferencing and index entries. See the conf.py file in the source for
+        # this documentation for an example
+
+        m = re.match(r"([a-zA-Z0-9_.]+)\s*(:([^=]+))?\s*(=(.+))?", sig)
+        assert m is not None
+
+        name = m.group(1)
+        value_type = m.group(3)
+        default_value = m.group(5)
+
+        name_parts = name.rsplit(".", maxsplit=1)
+        if len(name_parts) > 1:
+            node += sphinx.addnodes.desc_classname(name_parts[0])
+        node += sphinx.addnodes.desc_name(name_parts[-1], name_parts[-1])
+
+        if value_type is not None:
+            node += sphinx.addnodes.desc_sig_punctuation(" : ", " : ")
+            node += sphinx.addnodes.desc_type("", value_type)
+
+        if default_value is not None:
+            node += sphinx.addnodes.desc_sig_punctuation(" = ", " = ")
+
+            node += docutils.nodes.literal(
+                default_value,
+                default_value,
+                classes=["code", "highlight"],
+            )
+
+        return name
+
+    # Custom `confval` directive for more nicely documenting configuration values.
+    #
+    # Usage example:
+    # ```
+    # .. confval:: enable_foo: bool = False
+    #
+    #    Specifies whether the Foo is enabled or not.  Off by default.
+    # ```
+    # Both the type annotation and default value are optional.
+    #
+    # It is then also possible to reference it in other parts of the docs:
+    # ```
+    # This package supports the Foo, see :confval:`enable_foo`.
+    # ```
+    app.add_object_type(
+        "confval",
+        "confval",
+        objname="configuration value",
+        indextemplate="pair: %s; configuration value",
+        parse_node=confval_parse_format,
+    )
