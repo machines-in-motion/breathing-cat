@@ -1,4 +1,5 @@
 """Script to run breathing cat."""
+
 import argparse
 import logging
 import pathlib

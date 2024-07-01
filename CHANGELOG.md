@@ -6,8 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Options ``--skip-cpp``, ``--skip-python`` and ``--skip-cmake`` to disable
+- Options `--skip-cpp`, `--skip-python` and `--skip-cmake` to disable
   auto-generated API documentation for the corresponding language.
+- Custom `confval` directive and role for documenting configuration parameters.
 
 
 ## [1.3.1] - 2023-03-20

@@ -175,6 +175,30 @@ package:
   toctree.
 
 
+
+Special Directives/Roles
+------------------------
+
+### confval
+
+The `confval` directive can be used to specify configuration values.  It will be
+rendered similarly like a class member and can be linked to.  Further the `confval` role
+can be used to reference it in other parts for the documentation.
+
+Example:
+
+```rst
+.. confval:: enable_foo: bool = False
+
+   Here is some description of the parameter.
+   Note that the type annotation and default value are both optional.
+
+...
+
+To reference the option, use :confval:`enable_foo`.
+```
+
+
 Copyright & License
 -------------------
 

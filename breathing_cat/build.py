@@ -3,6 +3,7 @@
 License BSD-3-Clause
 Copyright (c) 2021, New York University and Max Planck Gesellschaft.
 """
+
 from __future__ import annotations
 
 import collections.abc
