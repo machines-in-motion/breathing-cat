@@ -176,8 +176,8 @@ package:
 
 
 
-Special Directives/Roles
-------------------------
+Special Directives/Roles/etc.
+-----------------------------
 
 ### confval
 
@@ -196,6 +196,22 @@ Example:
 ...
 
 To reference the option, use :confval:`enable_foo`.
+```
+
+
+### Using RST in Doxygen
+
+You can use the `@rst/@endrst` commands in Doxygen to use restructured text inside
+Doxygen comment blocks, e.g. for references.  Example:
+
+```
+/**
+ * @brief Do some foobar.
+ *
+ * @rst
+ * For the theory behind this, see :ref:`foobar_theory`.
+ * @endrst
+ */
 ```
 
 
